@@ -17,6 +17,7 @@ export class RestaurantDto {
   cardCvv:string
   cardExpirationDate:string
   isPoliciesAccepted:boolean
+  accountCreationDate:string
   uid:string
 
   static toJson(data: RestaurantDto): any {
@@ -39,6 +40,7 @@ export class RestaurantDto {
         "cardCvv":data.cardCvv,
         "cardExpirationDate":data.cardExpirationDate,
         "isPoliciesAccepted":data.isPoliciesAccepted,
+        "accountCreationDate":data.accountCreationDate,
         "uid":data.uid
     };
   }
@@ -64,6 +66,7 @@ export class RestaurantDto {
     object.cardCvv=data["cardCvv"];
     object.cardExpirationDate=data["cardExpirationDate"];
     object.isPoliciesAccepted=data["isPoliciesAccepted"];
+    object.accountCreationDate=data["accountCreationDate"];
     object.uid=data["uid"];
 
     return object;
