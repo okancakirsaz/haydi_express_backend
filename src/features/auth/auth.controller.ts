@@ -3,6 +3,7 @@ import { AuthService } from "./auth.services";
 import { RestaurantDto } from "src/core/dt_objects/user/restaurant.dto";
 import { LogInDto } from "src/core/dt_objects/auth/log_in.dto";
 import { ForgotPasswordDto } from "src/core/dt_objects/auth/forgot_password.dto";
+import { ResetPasswordDto } from "src/core/dt_objects/auth/reset_password.dto";
 
 //TODO: Import dto's.
 @Controller('auth')
@@ -26,10 +27,20 @@ export class AuthController{
         }
     }
 
-    @Post("forgot-password-restaurant")
-    async forgotPasswordInRestaurant(@Body() params:ForgotPasswordDto){
+    @Post("forgot-password")
+    async forgotPassword(@Body() params:ForgotPasswordDto){
         try {
-            return await this.service.forgotPasswordInRestaurant();
+            return await this.service.forgotPassword(params);
+        } catch (error) {
+            throw Error(error)
+        }
+    }
+
+
+    @Post("reset-password")
+    async resetPassword(@Body() params:ResetPasswordDto){
+        try {
+            return await this.service.resetPassword(params);
         } catch (error) {
             throw Error(error)
         }

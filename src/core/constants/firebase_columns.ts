@@ -1,3 +1,4 @@
 export enum FirebaseColumns{
-    RESTAURANTS = "RESTAURANTS",
+    USERS = "USERS",
+    PASSWORD_RESET_REQUESTS = "PASSWORD_RESET_REQUESTS",
 }

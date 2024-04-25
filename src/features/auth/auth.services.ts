@@ -4,16 +4,22 @@ import { BaseService } from "src/core/base/base_service";
 import { FirebaseColumns } from "src/core/constants/firebase_columns";
 import { RestaurantDto } from "src/core/dt_objects/user/restaurant.dto";
 import { LogInDto } from '../../core/dt_objects/auth/log_in.dto';
+import { ForgotPasswordDto } from "src/core/dt_objects/auth/forgot_password.dto";
+import { MailServices } from "src/core/services/mail_services";
+import { ResetPasswordDto } from "src/core/dt_objects/auth/reset_password.dto";
 
 
-//TODO:Make email verification system after then frontend
+//TODO:Add email verification
 @Injectable()
 export class AuthService extends BaseService{
+
+    private mailService:MailServices = new MailServices();
+
     async signUpAsRestaurant(data:RestaurantDto):Promise<RestaurantDto>{
        const newUser:UserRecord = await this.generateNewRestaurantInAuth(data);
        data.uid = newUser.uid;
        data.accountCreationDate=new Date().toUTCString();
-       await this.firebase.setData(FirebaseColumns.RESTAURANTS,data.uid,data);
+       await this.firebase.setData(FirebaseColumns.USERS,data.uid,data);
        return data;
     }
 
@@ -23,14 +29,29 @@ export class AuthService extends BaseService{
                 email:data.email,
                 emailVerified:data.isMailVerified,
                 phoneNumber:data.phoneNumber,
-                password:data.password,
                 displayName:data.ownerName
             }
         );
     }
 
-    //TODO: Do after web-interface
-    async forgotPasswordInRestaurant(){} 
+    async forgotPassword(data:ForgotPasswordDto):Promise<ForgotPasswordDto>{
+      const isMailSent:boolean =  await this.mailService.sendResetPasswordMail(data.mail,data.uid);
+      data.isMailSent=isMailSent;
+      await this.firebase.setData(FirebaseColumns.PASSWORD_RESET_REQUESTS,data.uid,{"uid":data.uid});
+      return data;
+    }
+
+    async resetPassword(data:ResetPasswordDto):Promise<ResetPasswordDto>{
+        //user.uid=data.uid=requestCheck["uid"]
+        const requestCheck:Record<string,string>= await this.firebase.getDoc(FirebaseColumns.PASSWORD_RESET_REQUESTS,data.uid);
+        const user:RestaurantDto = RestaurantDto.fromJson(await this.firebase.getDoc(FirebaseColumns.USERS,requestCheck["uid"]));
+        user.password = data.newPassword;
+        await this.firebase.updateData(FirebaseColumns.USERS,data.uid,RestaurantDto.toJson(user));
+        await this.firebase.deleteDoc(FirebaseColumns.PASSWORD_RESET_REQUESTS,user.uid);
+        return data;
+    }
+
+
     async logInAsRestaurant(data:LogInDto){
 
         //Try to get user from auth services.
@@ -44,7 +65,7 @@ export class AuthService extends BaseService{
         
         //If user already exist in our db check the password from firestore(auth services does not share password with us).
         else{
-        const userFromDb:RestaurantDto = RestaurantDto.fromJson(await this.firebase.getDoc(FirebaseColumns.RESTAURANTS,user.uid));
+        const userFromDb:RestaurantDto = RestaurantDto.fromJson(await this.firebase.getDoc(FirebaseColumns.USERS,user.uid));
         if(data.password==userFromDb.password){
             data.isLoginSuccess = true;
             data.uid = userFromDb.uid;
