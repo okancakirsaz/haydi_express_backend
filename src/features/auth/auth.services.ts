@@ -12,8 +12,7 @@ export class AuthService extends BaseService{
     async signUpAsRestaurant(data:RestaurantDto):Promise<RestaurantDto>{
        const newUser:UserRecord = await this.generateNewRestaurantInAuth(data);
        data.uid = newUser.uid;
-       //TODO:Review it
-       data.accountCreationDate=new Date().getUTCDate().toString();
+       data.accountCreationDate=new Date().toUTCString();
        await this.firebase.setData(FirebaseColumns.RESTAURANTS,data.uid,data);
        return data;
     }
