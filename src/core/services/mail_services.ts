@@ -28,10 +28,8 @@ export class MailServices{
             
             const info = await this.transporter.sendMail(mailOptions);
     
-            console.log('E-posta gönderildi:', info.response);
             return true;
         } catch (error) {
-            console.error('E-posta gönderilirken hata oluştu:', error);
             return false;
         }
     }
