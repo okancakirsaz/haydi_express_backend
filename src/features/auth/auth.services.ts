@@ -47,6 +47,7 @@ export class AuthService extends BaseService{
         const userFromDb:RestaurantDto = RestaurantDto.fromJson(await this.firebase.getDoc(FirebaseColumns.RESTAURANTS,user.uid));
         if(data.password==userFromDb.password){
             data.isLoginSuccess = true;
+            data.uid = userFromDb.uid;
             }
             else{
                 data.isLoginSuccess=false;

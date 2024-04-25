@@ -3,13 +3,15 @@ export class LogInDto {
     password: string;
     isLoginSuccess:boolean
     unSuccessfulReason?:string
+    uid?:string
     
     static toJson(data: LogInDto): any {
       return {
         "mail": data.mail,
         "password":data.password,
         "isLoginSuccess": data.isLoginSuccess,
-        "unSuccessfulReason":data.unSuccessfulReason
+        "unSuccessfulReason":data.unSuccessfulReason,
+        "uid":data.uid
       };
     }
   
@@ -19,6 +21,7 @@ export class LogInDto {
       object.password = data["password"];
       object.isLoginSuccess = data['isLoginSuccess'];
       object.unSuccessfulReason=data["unSuccessfulReason"];
+      object.uid=data["uid"];
       return object;
     }
   }
