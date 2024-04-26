@@ -35,10 +35,20 @@ export class AuthService extends BaseService{
     }
 
     async forgotPassword(data:ForgotPasswordDto):Promise<ForgotPasswordDto>{
-      const isMailSent:boolean =  await this.mailService.sendResetPasswordMail(data.mail,data.uid);
-      data.isMailSent=isMailSent;
-      await this.firebase.setData(FirebaseColumns.PASSWORD_RESET_REQUESTS,data.uid,{"uid":data.uid});
-      return data;
+      const user:UserRecord|null = await this.tryToGetUserWithEmail(data.mail);
+      if(user == null){
+        data.isMailSent=false;
+        return data;
+      }
+      else{
+        const isMailSent:boolean =  await this.mailService.sendResetPasswordMail(data.mail,user.uid);
+        data.isMailSent=isMailSent;
+        data.uid=user.uid;
+        await this.firebase.setData(FirebaseColumns.PASSWORD_RESET_REQUESTS,data.uid,{"uid":data.uid});
+        return data;
+      }
+
+      
     }
 
     async resetPassword(data:ResetPasswordDto):Promise<ResetPasswordDto>{
