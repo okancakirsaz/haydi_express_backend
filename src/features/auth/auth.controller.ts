@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from "@nestjs/common";
+import { Body, Controller, HttpException, Post } from "@nestjs/common";
 import { AuthService } from "./auth.services";
 import { RestaurantDto } from "src/core/dt_objects/user/restaurant.dto";
 import { LogInDto } from "src/core/dt_objects/auth/log_in.dto";
@@ -13,7 +13,7 @@ export class AuthController{
     constructor(private readonly service:AuthService){}
 
     @Post('sign-up-restaurant')
-    async signUpAsRestaurant(@Body() params:RestaurantDto):Promise<RestaurantDto>{
+    async signUpAsRestaurant(@Body() params:RestaurantDto):Promise<RestaurantDto|HttpException>{
     try {
     return await this.service.signUpAsRestaurant(params);
     } catch (error) {

@@ -1,6 +1,6 @@
 import * as admin from "firebase-admin";
 import serviceAccount from "../../serviceAccountKey.json";
-import { Firestore, getFirestore } from "firebase-admin/firestore";
+import { Firestore, WhereFilterOp, getFirestore } from "firebase-admin/firestore";
 import { Auth, getAuth } from "firebase-admin/auth";
 
 
@@ -43,6 +43,23 @@ async updateData(column:string,doc:string,data:any){
   } catch (error) {
     console.log(
       `You have an error in update ${column}/${doc} data\nThis is your error: `,
+      error
+    );
+  }
+}
+
+async getDataWithWhereQuery(column:string,whereKey:string,whereOperator:WhereFilterOp,whereValue:string){
+  try {
+    const queryRequest = await this.db.collection(column).where(whereKey,whereOperator,whereValue).get();
+    const dataList = [];
+
+    for(let i=0;i<=queryRequest.docs.length-1;i++){
+      dataList.push(queryRequest.docs[i].data());
+    }
+   return dataList.length==0?null: dataList;
+  } catch (error) {
+    console.log(
+      `You have an error in query ${column} data\nThis is your error: `,
       error
     );
   }

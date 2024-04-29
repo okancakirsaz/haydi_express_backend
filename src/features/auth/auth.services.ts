@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { UserRecord } from "firebase-admin/auth";
 import { BaseService } from "src/core/base/base_service";
 import { FirebaseColumns } from "src/core/constants/firebase_columns";
@@ -10,6 +10,7 @@ import { ResetPasswordDto } from "src/core/dt_objects/auth/reset_password.dto";
 import { MailVerificationRequestDto } from "src/core/dt_objects/auth/mail_verification_request.dto";
 import { randomInt } from "crypto";
 import { MailVerificationDto } from "src/core/dt_objects/auth/mail_verification.dto";
+import { user } from "firebase-functions/v1/auth";
 
 
 //TODO:Add email verification
@@ -18,12 +19,32 @@ export class AuthService extends BaseService{
 
     private mailService:MailServices = new MailServices();
 
-    async signUpAsRestaurant(data:RestaurantDto):Promise<RestaurantDto>{
-       const newUser:UserRecord = await this.generateNewRestaurantInAuth(data);
+    async signUpAsRestaurant(data:RestaurantDto):Promise<RestaurantDto|HttpException>{
+       if(await this._checkIsRestaurantAlreadyExist(data)){
+        const newUser:UserRecord = await this.generateNewRestaurantInAuth(data);
        data.uid = newUser.uid;
        data.accountCreationDate=new Date().toUTCString();
        await this.firebase.setData(FirebaseColumns.USERS,data.uid,data);
        return data;
+       }
+       else{
+        return new HttpException("Bu bilgilerle bir işletme hesabı açılmış.",HttpStatus.CONFLICT);
+       }
+      
+    }
+
+    private async _checkIsRestaurantAlreadyExist(data:RestaurantDto):Promise<boolean>{
+      const usersColumn:string = FirebaseColumns.USERS;
+      const getBankAccOwnerName = await this.firebase.getDataWithWhereQuery(usersColumn,"bankAccountOwner","==",data.bankAccountOwner);
+      const getEmail = await this.firebase.getDataWithWhereQuery(usersColumn,"email","==",data.email);
+      const getPhoneNumber = await this.firebase.getDataWithWhereQuery(usersColumn,"phoneNumber","==",data.phoneNumber);
+      const getIban =  await this.firebase.getDataWithWhereQuery(usersColumn,"ibanNumber","==",data.ibanNumber);
+      if(getBankAccOwnerName!=null||getEmail!=null||getPhoneNumber!=null||getIban!=null){
+        return false;
+      }
+      else{
+        return true;
+      }
     }
 
     private async generateNewRestaurantInAuth(data:RestaurantDto):Promise<UserRecord>{
