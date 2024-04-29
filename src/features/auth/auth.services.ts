@@ -7,6 +7,9 @@ import { LogInDto } from '../../core/dt_objects/auth/log_in.dto';
 import { ForgotPasswordDto } from "src/core/dt_objects/auth/forgot_password.dto";
 import { MailServices } from "src/core/services/mail_services";
 import { ResetPasswordDto } from "src/core/dt_objects/auth/reset_password.dto";
+import { MailVerificationRequestDto } from "src/core/dt_objects/auth/mail_verification_request.dto";
+import { randomInt } from "crypto";
+import { MailVerificationDto } from "src/core/dt_objects/auth/mail_verification.dto";
 
 
 //TODO:Add email verification
@@ -96,5 +99,32 @@ export class AuthService extends BaseService{
         return null;
        }
         
+    }
+
+
+
+    async mailVerificationRequest(params:MailVerificationRequestDto):Promise<MailVerificationRequestDto>{
+      const activationCode:string = randomInt(1000,9999).toString();
+      const isMailSent:boolean=await this.mailService.sendVerificationCode(params.email,activationCode);
+      params.isMailSent=isMailSent;
+      if(isMailSent){
+        params.verificationCode=activationCode;
+        await this.firebase.setData(FirebaseColumns.VERIFICATION_REQUESTS,params.email,MailVerificationRequestDto.toJson(params));
+      }
+      return params;
+    }
+
+
+    async mailVerification(params:MailVerificationDto):Promise<MailVerificationDto>{
+      const columnName:string = FirebaseColumns.VERIFICATION_REQUESTS;
+      const response:MailVerificationDto = MailVerificationDto.fromJson(await this.firebase.getDoc(columnName,params.email));
+      if(response.verificationCode==params.verificationCode){
+        params.isCodeTrue=true;
+        await this.firebase.deleteDoc(columnName,params.email);
+      }
+      else{
+        params.isCodeTrue=false;
+      }
+      return params;
     }
 }
