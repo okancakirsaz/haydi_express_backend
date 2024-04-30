@@ -7,7 +7,7 @@ import { ResetPasswordDto } from "src/core/dt_objects/auth/reset_password.dto";
 import { MailVerificationRequestDto } from "src/core/dt_objects/auth/mail_verification_request.dto";
 import { MailVerificationDto } from "src/core/dt_objects/auth/mail_verification.dto";
 
-//TODO: Import dto's.
+
 @Controller('auth')
 export class AuthController{
     constructor(private readonly service:AuthService){}

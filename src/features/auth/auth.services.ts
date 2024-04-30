@@ -10,10 +10,8 @@ import { ResetPasswordDto } from "src/core/dt_objects/auth/reset_password.dto";
 import { MailVerificationRequestDto } from "src/core/dt_objects/auth/mail_verification_request.dto";
 import { randomInt } from "crypto";
 import { MailVerificationDto } from "src/core/dt_objects/auth/mail_verification.dto";
-import { user } from "firebase-functions/v1/auth";
 
 
-//TODO:Add email verification
 @Injectable()
 export class AuthService extends BaseService{
 
