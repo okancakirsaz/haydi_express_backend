@@ -1,4 +1,4 @@
-import { Body, Controller, HttpException, Post, Req, UploadedFile, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Get, Header, Param, Post, UploadedFile, UseInterceptors } from "@nestjs/common";
 import { MenuService } from "./menu.service";
 import { MenuDto } from "src/core/dt_objects/menu/menu.dto";
 import { FileInterceptor } from "@nestjs/platform-express/multer";
@@ -19,4 +19,12 @@ export class MenuController{
         }
     }
 
+    @Get('get-restaurant-menu/:id')
+    async getRestaurantMenu(@Param("id") id:string){
+        try {
+            return await this.service.getRestaurantMenu(id);
+        } catch (error) {
+            throw Error(error);
+        }
+    }
 }
