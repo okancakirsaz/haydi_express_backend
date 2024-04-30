@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { FirebaseServices } from './core/services/firebase_services';
 import { AppModule } from './app.module';
+import { json } from 'express';
 
 
 async function bootstrap() {
@@ -15,7 +16,7 @@ async function bootstrap() {
     credentials: true,
     allowedHeaders: 'Content-Type, Accept, Authorization',
   });
-
+  app.use(json({ limit: '10mb' }));
   await app.listen(3000);
 }
 bootstrap();
