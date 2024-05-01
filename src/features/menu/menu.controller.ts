@@ -2,6 +2,7 @@ import { Body, Controller, Get, Post, Query, UploadedFile, UseInterceptors } fro
 import { MenuService } from "./menu.service";
 import { MenuDto } from "src/core/dt_objects/menu/menu.dto";
 import { FileInterceptor } from "@nestjs/platform-express/multer";
+import { DiscountDto } from "src/core/dt_objects/menu/discount.dto";
 
 
 
@@ -23,6 +24,15 @@ export class MenuController{
     async getRestaurantMenu(@Query("id") id:string){
         try {
             return await this.service.getRestaurantMenu(id);
+        } catch (error) {
+            throw Error(error);
+        }
+    }
+
+    @Post('add-discount')
+    async addDiscount(@Body() params:DiscountDto):Promise<DiscountDto>{
+        try {
+            return await this.service.addDiscount(params);
         } catch (error) {
             throw Error(error);
         }
