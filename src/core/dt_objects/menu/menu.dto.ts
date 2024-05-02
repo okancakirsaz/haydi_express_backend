@@ -4,7 +4,7 @@ export class MenuDto{
     photoUrl:string;
     content:string;
     restaurantUid:string;
-    isOnDiscount?:boolean;
+    isOnDiscount:boolean;
     discountAmount?:number;
     discountFinishDate?:string;
     menuId:string;
