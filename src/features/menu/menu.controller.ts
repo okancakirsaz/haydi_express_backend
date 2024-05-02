@@ -37,4 +37,13 @@ export class MenuController{
             throw Error(error);
         }
     }
+
+    @Get('cancel-campaign')
+    async cancelCampaign(@Query("menuId") menuId:string):Promise<boolean>{
+        try {
+            return await this.service.cancelCampaign(menuId);
+        } catch (error) {
+            throw Error(error);
+        }
+    }
 }

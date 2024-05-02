@@ -31,4 +31,19 @@ export class MenuService extends BaseService{
         await this.firebase.updateData(column,params.menuId,MenuDto.toJson(menuItem));
         return params;
     }
+
+
+    async cancelCampaign(menuId:string):Promise<boolean>{
+        try {
+        const column:string = FirebaseColumns.RESTAURANT_MENUS;
+        const menuElement:MenuDto = MenuDto.fromJson((await this.firebase.getDoc(column,menuId)));
+        menuElement.discountAmount=null;
+        menuElement.discountFinishDate=null;
+        menuElement.isOnDiscount = false;
+        await this.firebase.updateData(column,menuId,MenuDto.toJson(menuElement));
+        return true;
+        } catch (error) {
+            return false;
+        }
+    }
 }
