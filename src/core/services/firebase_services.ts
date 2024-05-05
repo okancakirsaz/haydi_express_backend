@@ -3,7 +3,7 @@ import serviceAccount from "../../serviceAccountKey.json";
 import { Firestore, WhereFilterOp, getFirestore } from "firebase-admin/firestore";
 import { Auth, getAuth } from "firebase-admin/auth";
 import { FirebaseApp, initializeApp } from "firebase/app";
-import { ref, uploadBytesResumable,getDownloadURL, getStorage } from "@firebase/storage";
+import { ref, uploadBytesResumable,getDownloadURL, getStorage, deleteObject } from "@firebase/storage";
 
 
 export class FirebaseServices{
@@ -82,12 +82,21 @@ async getDataWithWhereQuery(column:string,whereKey:string,whereOperator:WhereFil
 }
 
 
-async uploadFileToFirestore(collection:string,subCollection:string,refId:string,file:Express.Multer.File):Promise<string>{
+async uploadFileToStorage(collection:string,subCollection:string,refId:string,file:Express.Multer.File):Promise<string>{
   const storageRef = ref(
     this.storage,
     `${collection}/${subCollection}/${refId}.jpg`
   );
   await uploadBytesResumable(storageRef, Uint8Array.from(file.buffer));
   return await getDownloadURL(storageRef);
+}
+
+
+async deleteFileFromStorage(collection:string,subCollection:string,refId:string){
+  const storageRef = ref(
+    this.storage,
+    `${collection}/${subCollection}/${refId}.jpg`
+  );
+  await deleteObject(storageRef);
 }
 }

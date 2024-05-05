@@ -1,3 +1,5 @@
+import { MenuStatsDto } from "./menu_stats.dto";
+
 export class MenuDto{
     name:string;
     price:number;
@@ -8,8 +10,7 @@ export class MenuDto{
     discountAmount?:number;
     discountFinishDate?:string;
     menuId:string;
-    //TODO: Add menu stats model
-    stats:any;
+    stats:MenuStatsDto;
 
     static toJson(data: MenuDto): any {
         return {
@@ -22,7 +23,7 @@ export class MenuDto{
           "discountAmount":data.discountAmount,
           "discountFinishDate": data.discountFinishDate,
           "menuId":data.menuId,
-          "stats":data.stats,
+          "stats":MenuStatsDto.toJson(data.stats),
         };
       }
     
@@ -37,7 +38,7 @@ export class MenuDto{
         object.discountAmount = data["discountAmount"];
         object.discountFinishDate = data['discountFinishDate'];
         object.menuId=data["menuId"];
-        object.stats=data["stats"];
+        object.stats=MenuStatsDto.fromJson(data["stats"]);
         return object;
       }
 }

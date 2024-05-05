@@ -21,7 +21,7 @@ export class AuthService extends BaseService{
        if(await this._checkIsRestaurantAlreadyExist(data)){
         const newUser:UserRecord = await this.generateNewRestaurantInAuth(data);
        data.uid = newUser.uid;
-       data.accountCreationDate=new Date().toUTCString();
+       data.accountCreationDate=new Date().toISOString();
        await this.firebase.setData(FirebaseColumns.USERS,data.uid,data);
        return data;
        }

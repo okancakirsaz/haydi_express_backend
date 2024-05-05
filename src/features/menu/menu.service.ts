@@ -9,7 +9,7 @@ import { MenuDto } from "src/core/dt_objects/menu/menu.dto";
 export class MenuService extends BaseService{
 
     async createMenu(params:MenuDto,file:Express.Multer.File):Promise<MenuDto>{
-        const fileUrl:string = await this.firebase.uploadFileToFirestore(params.restaurantUid,"menu",params.menuId,file);
+        const fileUrl:string = await this.firebase.uploadFileToStorage(params.restaurantUid,"menu",params.menuId,file);
         params.photoUrl = fileUrl;
         await this.firebase.setData(FirebaseColumns.RESTAURANT_MENUS,params.menuId,MenuDto.toJson(params));
         return params;
@@ -45,5 +45,16 @@ export class MenuService extends BaseService{
         } catch (error) {
             return false;
         }
+    }
+
+
+    async deleteMenu(params:MenuDto):Promise<boolean>{
+       try {
+        await this.firebase.deleteDoc(FirebaseColumns.RESTAURANT_MENUS,params.menuId);
+        await this.firebase.deleteFileFromStorage(params.restaurantUid,"menu",params.menuId);
+        return true;
+       } catch (error) {
+        return false;
+       }
     }
 }

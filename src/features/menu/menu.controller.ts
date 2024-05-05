@@ -46,4 +46,13 @@ export class MenuController{
             throw Error(error);
         }
     }
+
+    @Post('delete-menu')
+    async deleteMenu(@Body() params:MenuDto):Promise<boolean>{
+        try {
+            return await this.service.deleteMenu(params);
+        } catch (error) {
+            throw Error(error);
+        }
+    }
 }
