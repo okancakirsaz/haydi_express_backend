@@ -64,7 +64,7 @@ async updateData(column:string,doc:string,data:any){
   }
 }
 
-async getDataWithWhereQuery(column:string,whereKey:string,whereOperator:WhereFilterOp,whereValue:string){
+async getDataWithWhereQuery(column:string,whereKey:string,whereOperator:WhereFilterOp,whereValue:any){
   try {
     const queryRequest = await this.db.collection(column).where(whereKey,whereOperator,whereValue).get();
     const dataList = [];
