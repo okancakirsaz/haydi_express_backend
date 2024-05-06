@@ -18,10 +18,10 @@ export class AuthService extends BaseService{
     private mailService:MailServices = new MailServices();
 
     async signUpAsRestaurant(data:RestaurantDto):Promise<RestaurantDto|HttpException>{
-       if(await this._checkIsRestaurantAlreadyExist(data)){
+       if(await this._checkIsRestaurantAlreadyNotExist(data)){
         const newUser:UserRecord = await this.generateNewRestaurantInAuth(data);
        data.uid = newUser.uid;
-       data.accountCreationDate=new Date().toISOString();
+       data.nextPaymentDate = this.generateNewRestaurantNextPaymentDate(),
        await this.firebase.setData(FirebaseColumns.USERS,data.uid,data);
        return data;
        }
@@ -31,7 +31,7 @@ export class AuthService extends BaseService{
       
     }
 
-    private async _checkIsRestaurantAlreadyExist(data:RestaurantDto):Promise<boolean>{
+    private async _checkIsRestaurantAlreadyNotExist(data:RestaurantDto):Promise<boolean>{
       const usersColumn:string = FirebaseColumns.USERS;
       const getBankAccOwnerName = await this.firebase.getDataWithWhereQuery(usersColumn,"bankAccountOwner","==",data.bankAccountOwner);
       const getEmail = await this.firebase.getDataWithWhereQuery(usersColumn,"email","==",data.email);
@@ -43,6 +43,15 @@ export class AuthService extends BaseService{
       else{
         return true;
       }
+    }
+
+    private generateNewRestaurantNextPaymentDate():string{
+      const currentDate = new Date();
+      const targetMonth = (currentDate.getMonth() + 6) % 12;
+      const targetYear = currentDate.getFullYear() + Math.floor((currentDate.getMonth() + 6) / 12);
+  
+      const targetDate = new Date(targetYear, targetMonth, currentDate.getDate());
+      return targetDate.toISOString();
     }
 
     private async generateNewRestaurantInAuth(data:RestaurantDto):Promise<UserRecord>{
@@ -101,6 +110,7 @@ export class AuthService extends BaseService{
         if(data.password==userFromDb.password){
             data.isLoginSuccess = true;
             data.uid = userFromDb.uid;
+            data.restaurantData = userFromDb;
             }
             else{
                 data.isLoginSuccess=false;

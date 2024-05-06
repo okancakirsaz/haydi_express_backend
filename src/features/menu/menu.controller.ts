@@ -20,6 +20,16 @@ export class MenuController{
         }
     }
 
+    @Post('edit-menu')
+    @UseInterceptors(FileInterceptor('file'))
+    async editMenu(@Body() params,@UploadedFile() file:Express.Multer.File|null):Promise<MenuDto>{
+        try {
+            return await this.service.editMenu(MenuDto.fromJson(JSON.parse(params['json'])),file);
+        } catch (error) {
+            throw Error(error);
+        }
+    }
+
     @Get('get-restaurant-menu')
     async getRestaurantMenu(@Query("id") id:string){
         try {

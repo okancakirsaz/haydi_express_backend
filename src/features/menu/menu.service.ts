@@ -15,6 +15,15 @@ export class MenuService extends BaseService{
         return params;
     }
 
+    async editMenu(params:MenuDto,file:Express.Multer.File|null):Promise<MenuDto>{
+        if(file!=null){
+        const fileUrl:string = await this.firebase.uploadFileToStorage(params.restaurantUid,"menu",params.menuId,file);
+        params.photoUrl = fileUrl;
+        }
+        await this.firebase.updateData(FirebaseColumns.RESTAURANT_MENUS,params.menuId,MenuDto.toJson(params));
+        return params;
+    }
+
 
     async getRestaurantMenu(id:string):Promise<any[]>{
         return await this.firebase.getDataWithWhereQuery(FirebaseColumns.RESTAURANT_MENUS,"restaurantUid","==",id);

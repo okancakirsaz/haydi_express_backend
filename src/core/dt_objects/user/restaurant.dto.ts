@@ -19,6 +19,8 @@ export class RestaurantDto {
   isPoliciesAccepted:boolean
   accountCreationDate:string
   uid:string
+  nextPaymentDate?:string;
+  isAccountBanned:boolean;
 
   static toJson(data: RestaurantDto): any {
     return {
@@ -41,7 +43,9 @@ export class RestaurantDto {
         "cardExpirationDate":data.cardExpirationDate,
         "isPoliciesAccepted":data.isPoliciesAccepted,
         "accountCreationDate":data.accountCreationDate,
-        "uid":data.uid
+        "uid":data.uid,
+        "nextPaymentDate":data.nextPaymentDate,
+        "isAccountBanned":data.isAccountBanned,
     };
   }
 
@@ -68,6 +72,8 @@ export class RestaurantDto {
     object.isPoliciesAccepted=data["isPoliciesAccepted"];
     object.accountCreationDate=data["accountCreationDate"];
     object.uid=data["uid"];
+    object.nextPaymentDate=data['nextPaymentDate'];
+    object.isAccountBanned=data['isAccountBanned']
 
     return object;
   }
