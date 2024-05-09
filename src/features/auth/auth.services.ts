@@ -201,4 +201,32 @@ export class AuthService extends BaseService{
       }
     }
 
+
+    async logInAsCustomer(data:LogInDto){
+
+      //Try to get user from auth services.
+      const user:Record<string,any>|null = await this.tryToGetUserWithEmail(data.mail,FirebaseColumns.CUSTOMERS);
+
+      //If user does not exist in our db return false values. 
+      if(user == null){
+        data.isLoginSuccess=false;
+        data.unSuccessfulReason="Hatalı E-Posta";
+      }
+      
+      //If user already exist in our db check the password from firestore(auth services does not share password with us).
+      else{
+      const userFromDb:CustomerDto = CustomerDto.fromJson(await this.firebase.getDoc(FirebaseColumns.CUSTOMERS,user.uid));
+      if(data.password==userFromDb.password){
+          data.isLoginSuccess = true;
+          data.uid = userFromDb.uid;
+          data.customerData = userFromDb;
+          }
+          else{
+              data.isLoginSuccess=false;
+              data.unSuccessfulReason="Hatalı Şifre";
+          }
+      }
+      return data;
+  }
+
 }

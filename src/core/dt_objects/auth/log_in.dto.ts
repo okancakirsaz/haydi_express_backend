@@ -1,4 +1,5 @@
 import { RestaurantDto } from "../user/restaurant.dto";
+import { CustomerDto } from "./customer.dto";
 
 export class LogInDto {
     mail: string;
@@ -6,6 +7,7 @@ export class LogInDto {
     isLoginSuccess:boolean
     unSuccessfulReason?:string
     restaurantData?:RestaurantDto
+    customerData?:CustomerDto
     uid?:string
     
     static toJson(data: LogInDto): any {
@@ -15,6 +17,7 @@ export class LogInDto {
         "isLoginSuccess": data.isLoginSuccess,
         "unSuccessfulReason":data.unSuccessfulReason,
         "restaurantData":RestaurantDto.toJson(data.restaurantData),
+        "customerData":CustomerDto.toJson(data.customerData),
         "uid":data.uid
       };
     }
@@ -26,6 +29,7 @@ export class LogInDto {
       object.isLoginSuccess = data['isLoginSuccess'];
       object.unSuccessfulReason=data["unSuccessfulReason"];
       object.restaurantData = RestaurantDto.fromJson(data['restaurantData'])
+      object.customerData = CustomerDto.fromJson(data['customerData'])
       object.uid=data["uid"];
       return object;
     }

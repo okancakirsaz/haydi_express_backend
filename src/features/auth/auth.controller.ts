@@ -32,6 +32,15 @@ export class AuthController{
         }
     }
 
+    @Post("log-in-customer")
+    async logInAsCustomer(@Body() params:LogInDto){
+        try {
+            return await this.service.logInAsCustomer(params);
+        } catch (error) {
+            throw Error(error)
+        }
+    }
+
     @Post("forgot-password-restaurant")
     async forgotPasswordRestaurant(@Body() params:ForgotPasswordDto){
         try {
