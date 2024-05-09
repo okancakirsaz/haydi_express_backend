@@ -10,6 +10,7 @@ import { ResetPasswordDto } from "src/core/dt_objects/auth/reset_password.dto";
 import { MailVerificationRequestDto } from "src/core/dt_objects/auth/mail_verification_request.dto";
 import { randomInt } from "crypto";
 import { MailVerificationDto } from "src/core/dt_objects/auth/mail_verification.dto";
+import { CustomerDto } from "src/core/dt_objects/auth/customer.dto";
 
 
 @Injectable()
@@ -22,7 +23,7 @@ export class AuthService extends BaseService{
         const newUser:UserRecord = await this.generateNewRestaurantInAuth(data);
        data.uid = newUser.uid;
        data.nextPaymentDate = this.generateNewRestaurantNextPaymentDate(),
-       await this.firebase.setData(FirebaseColumns.USERS,data.uid,data);
+       await this.firebase.setData(FirebaseColumns.RESTAURANTS,data.uid,data);
        return data;
        }
        else{
@@ -32,7 +33,7 @@ export class AuthService extends BaseService{
     }
 
     private async _checkIsRestaurantAlreadyNotExist(data:RestaurantDto):Promise<boolean>{
-      const usersColumn:string = FirebaseColumns.USERS;
+      const usersColumn:string = FirebaseColumns.RESTAURANTS;
       const getBankAccOwnerName = await this.firebase.getDataWithWhereQuery(usersColumn,"bankAccountOwner","==",data.bankAccountOwner);
       const getEmail = await this.firebase.getDataWithWhereQuery(usersColumn,"email","==",data.email);
       const getPhoneNumber = await this.firebase.getDataWithWhereQuery(usersColumn,"phoneNumber","==",data.phoneNumber);
@@ -65,29 +66,39 @@ export class AuthService extends BaseService{
         );
     }
 
-    async forgotPassword(data:ForgotPasswordDto):Promise<ForgotPasswordDto>{
-      const user:UserRecord|null = await this.tryToGetUserWithEmail(data.mail);
+    async forgotPassword(data:ForgotPasswordDto,column:string):Promise<ForgotPasswordDto>{
+      const user:Record<string,any>|null = await this.tryToGetUserWithEmail(data.mail,column);
       if(user == null){
         data.isMailSent=false;
-        return data;
+        return data;  
       }
       else{
         const isMailSent:boolean =  await this.mailService.sendResetPasswordMail(data.mail,user.uid);
         data.isMailSent=isMailSent;
         data.uid=user.uid;
-        await this.firebase.setData(FirebaseColumns.PASSWORD_RESET_REQUESTS,data.uid,{"uid":data.uid});
+        await this.firebase.setData(FirebaseColumns.PASSWORD_RESET_REQUESTS,data.uid,{"uid":data.uid,"user":column});
         return data;
       }
 
       
     }
 
-    async resetPassword(data:ResetPasswordDto):Promise<ResetPasswordDto>{
+    async resetPassword(data:ResetPasswordDto,):Promise<ResetPasswordDto>{
         //user.uid=data.uid=requestCheck["uid"]
         const requestCheck:Record<string,string>= await this.firebase.getDoc(FirebaseColumns.PASSWORD_RESET_REQUESTS,data.uid);
-        const user:RestaurantDto = RestaurantDto.fromJson(await this.firebase.getDoc(FirebaseColumns.USERS,requestCheck["uid"]));
-        user.password = data.newPassword;
-        await this.firebase.updateData(FirebaseColumns.USERS,data.uid,RestaurantDto.toJson(user));
+        let user:any;
+        if(requestCheck["user"]==FirebaseColumns.CUSTOMERS){
+           user = CustomerDto.fromJson(await this.firebase.getDoc(FirebaseColumns.CUSTOMERS,requestCheck["uid"]));
+           user.password = data.newPassword;
+           await this.firebase.updateData(FirebaseColumns.CUSTOMERS,data.uid, CustomerDto.toJson(user));
+        }
+        else{
+          user= RestaurantDto.fromJson(await this.firebase.getDoc(FirebaseColumns.RESTAURANTS,requestCheck["uid"]));
+          user.password = data.newPassword;
+          await this.firebase.updateData(FirebaseColumns.RESTAURANTS,data.uid, RestaurantDto.toJson(user));
+        }
+        
+        
         await this.firebase.deleteDoc(FirebaseColumns.PASSWORD_RESET_REQUESTS,user.uid);
         return data;
     }
@@ -96,7 +107,7 @@ export class AuthService extends BaseService{
     async logInAsRestaurant(data:LogInDto){
 
         //Try to get user from auth services.
-        const user:UserRecord|null = await this.tryToGetUserWithEmail(data.mail);
+        const user:Record<string,any>|null = await this.tryToGetUserWithEmail(data.mail,FirebaseColumns.RESTAURANTS);
 
         //If user does not exist in our db return false values. 
         if(user == null){
@@ -106,7 +117,7 @@ export class AuthService extends BaseService{
         
         //If user already exist in our db check the password from firestore(auth services does not share password with us).
         else{
-        const userFromDb:RestaurantDto = RestaurantDto.fromJson(await this.firebase.getDoc(FirebaseColumns.USERS,user.uid));
+        const userFromDb:RestaurantDto = RestaurantDto.fromJson(await this.firebase.getDoc(FirebaseColumns.RESTAURANTS,user.uid));
         if(data.password==userFromDb.password){
             data.isLoginSuccess = true;
             data.uid = userFromDb.uid;
@@ -120,9 +131,9 @@ export class AuthService extends BaseService{
         return data;
     }
 
-    private async tryToGetUserWithEmail(email:string):Promise<UserRecord|null>{
+    private async tryToGetUserWithEmail(email:string,column:string):Promise<Record<string,any>|null>{
        try {
-        const user:UserRecord = await this.firebase.auth.getUserByEmail(email);
+        const user:any|null =(await this.firebase.getDataWithWhereQuery(column,"email","==",email))[0];
         return user;
        } catch (error) {
         return null;
@@ -156,4 +167,38 @@ export class AuthService extends BaseService{
       }
       return params;
     }
+
+
+
+    async signUpCustomer(params:CustomerDto):Promise<CustomerDto|HttpException>{
+      try {
+       if(!await this.isCustomerAlreadyExist(params.email)){
+        return new HttpException(
+          "Bu email adresi daha önceden kullanılmış.",
+          HttpStatus.ACCEPTED,
+        );
+       }
+       else{
+        await this.firebase.setData(FirebaseColumns.CUSTOMERS,params.uid,CustomerDto.toJson(params),);
+       return params;
+       }
+      } catch (error) {
+        return new HttpException(
+          "Kayıt olma başarısız",
+          HttpStatus.ACCEPTED,
+        );
+      }
+    }
+
+
+    private async isCustomerAlreadyExist(email:string):Promise<boolean>{
+      const getEmail = await this.firebase.getDataWithWhereQuery(FirebaseColumns.CUSTOMERS,"email","==",email);
+      if(getEmail!=null){
+        return false;
+      }
+      else{
+        return true;
+      }
+    }
+
 }

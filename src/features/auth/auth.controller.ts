@@ -6,6 +6,9 @@ import { ForgotPasswordDto } from "src/core/dt_objects/auth/forgot_password.dto"
 import { ResetPasswordDto } from "src/core/dt_objects/auth/reset_password.dto";
 import { MailVerificationRequestDto } from "src/core/dt_objects/auth/mail_verification_request.dto";
 import { MailVerificationDto } from "src/core/dt_objects/auth/mail_verification.dto";
+import { params } from "firebase-functions/v1";
+import { CustomerDto } from "src/core/dt_objects/auth/customer.dto";
+import { FirebaseColumns } from "src/core/constants/firebase_columns";
 
 
 @Controller('auth')
@@ -29,10 +32,19 @@ export class AuthController{
         }
     }
 
-    @Post("forgot-password")
-    async forgotPassword(@Body() params:ForgotPasswordDto){
+    @Post("forgot-password-restaurant")
+    async forgotPasswordRestaurant(@Body() params:ForgotPasswordDto){
         try {
-            return await this.service.forgotPassword(params);
+            return await this.service.forgotPassword(params,FirebaseColumns.RESTAURANTS);
+        } catch (error) {
+            throw Error(error)
+        }
+    }
+
+    @Post("forgot-password-customer")
+    async forgotPasswordCustomer(@Body() params:ForgotPasswordDto){
+        try {
+            return await this.service.forgotPassword(params,FirebaseColumns.CUSTOMERS);
         } catch (error) {
             throw Error(error)
         }
@@ -61,6 +73,16 @@ export class AuthController{
     async mailVerification(@Body() params:MailVerificationDto){
         try {
             return await this.service.mailVerification(params);
+        } catch (error) {
+            throw Error(error)
+        }
+    }
+
+
+    @Post("sign-up-customer")
+    async signUpCustomer(@Body() params:CustomerDto):Promise<CustomerDto|HttpException>{
+        try {
+            return await this.service.signUpCustomer(params);
         } catch (error) {
             throw Error(error)
         }
