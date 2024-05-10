@@ -1,5 +1,5 @@
 import { RestaurantDto } from "../user/restaurant.dto";
-import { CustomerDto } from "./customer.dto";
+import { CustomerDto } from "../user/customer.dto";
 
 export class LogInDto {
     mail: string;

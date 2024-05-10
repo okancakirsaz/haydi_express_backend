@@ -10,7 +10,7 @@ import { ResetPasswordDto } from "src/core/dt_objects/auth/reset_password.dto";
 import { MailVerificationRequestDto } from "src/core/dt_objects/auth/mail_verification_request.dto";
 import { randomInt } from "crypto";
 import { MailVerificationDto } from "src/core/dt_objects/auth/mail_verification.dto";
-import { CustomerDto } from "src/core/dt_objects/auth/customer.dto";
+import { CustomerDto } from "src/core/dt_objects/user/customer.dto";
 import { CustomerAuthService } from "./customer_auth.service";
 import { RestaurantAuthService } from "./restaurant_auth.service";
 

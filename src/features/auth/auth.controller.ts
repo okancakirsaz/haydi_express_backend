@@ -7,7 +7,7 @@ import { ResetPasswordDto } from "src/core/dt_objects/auth/reset_password.dto";
 import { MailVerificationRequestDto } from "src/core/dt_objects/auth/mail_verification_request.dto";
 import { MailVerificationDto } from "src/core/dt_objects/auth/mail_verification.dto";
 import { params } from "firebase-functions/v1";
-import { CustomerDto } from "src/core/dt_objects/auth/customer.dto";
+import { CustomerDto } from "src/core/dt_objects/user/customer.dto";
 import { FirebaseColumns } from "src/core/constants/firebase_columns";
 import { CustomerAuthService } from "./service/customer_auth.service";
 import { RestaurantAuthService } from "./service/restaurant_auth.service";

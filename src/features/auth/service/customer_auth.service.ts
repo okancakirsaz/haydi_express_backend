@@ -1,6 +1,6 @@
 import { BaseService } from "src/core/base/base_service";
 import { AuthService } from "./auth.services";
-import { CustomerDto } from "src/core/dt_objects/auth/customer.dto";
+import { CustomerDto } from "src/core/dt_objects/user/customer.dto";
 import { FirebaseColumns } from "src/core/constants/firebase_columns";
 import { LogInDto } from "src/core/dt_objects/auth/log_in.dto";
 import { HttpException, HttpStatus } from "@nestjs/common";
