@@ -39,6 +39,10 @@ export class AuthService extends BaseService {
       
     }
 
+
+    //TODO: *REVIEW* Return simple boolean data as response because
+    //if user web client receive new password this my be reason for few security vulnerable.
+    //Attacker can take new password data with arp poisoning attack
     async resetPassword(data:ResetPasswordDto,):Promise<ResetPasswordDto>{
         //user.uid=data.uid=requestCheck["uid"]
         const requestCheck:Record<string,string>= await this.firebase.getDoc(FirebaseColumns.PASSWORD_RESET_REQUESTS,data.uid);
