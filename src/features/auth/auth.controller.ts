@@ -1,5 +1,5 @@
 import { Body, Controller, HttpException, Post } from "@nestjs/common";
-import { AuthService } from "./auth.services";
+import { AuthService } from "./service/auth.services";
 import { RestaurantDto } from "src/core/dt_objects/user/restaurant.dto";
 import { LogInDto } from "src/core/dt_objects/auth/log_in.dto";
 import { ForgotPasswordDto } from "src/core/dt_objects/auth/forgot_password.dto";
@@ -9,16 +9,18 @@ import { MailVerificationDto } from "src/core/dt_objects/auth/mail_verification.
 import { params } from "firebase-functions/v1";
 import { CustomerDto } from "src/core/dt_objects/auth/customer.dto";
 import { FirebaseColumns } from "src/core/constants/firebase_columns";
+import { CustomerAuthService } from "./service/customer_auth.service";
+import { RestaurantAuthService } from "./service/restaurant_auth.service";
 
 
 @Controller('auth')
 export class AuthController{
-    constructor(private readonly service:AuthService){}
+    constructor(private readonly service:AuthService,private readonly customerService:CustomerAuthService,private readonly restaurantService:RestaurantAuthService){}
 
     @Post('sign-up-restaurant')
     async signUpAsRestaurant(@Body() params:RestaurantDto):Promise<RestaurantDto|HttpException>{
     try {
-    return await this.service.signUpAsRestaurant(params);
+    return await this.restaurantService.signUpAsRestaurant(params);
     } catch (error) {
     throw Error(error);
     }
@@ -26,7 +28,7 @@ export class AuthController{
     @Post("log-in-restaurant")
     async logInAsRestaurant(@Body() params:LogInDto){
         try {
-            return await this.service.logInAsRestaurant(params);
+            return await this.restaurantService.logInAsRestaurant(params);
         } catch (error) {
             throw Error(error)
         }
@@ -35,7 +37,7 @@ export class AuthController{
     @Post("log-in-customer")
     async logInAsCustomer(@Body() params:LogInDto){
         try {
-            return await this.service.logInAsCustomer(params);
+            return await this.customerService.logInAsCustomer(params);
         } catch (error) {
             throw Error(error)
         }
@@ -91,7 +93,7 @@ export class AuthController{
     @Post("sign-up-customer")
     async signUpCustomer(@Body() params:CustomerDto):Promise<CustomerDto|HttpException>{
         try {
-            return await this.service.signUpCustomer(params);
+            return await this.customerService.signUpCustomer(params);
         } catch (error) {
             throw Error(error)
         }
