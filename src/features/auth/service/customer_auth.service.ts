@@ -38,6 +38,10 @@ export class CustomerAuthService extends AuthService{
       }
   
       //TODO: Optimize it
+      //TODO: *REVIEW* Set log in function as public function between restaurant and customer
+      //TODO: *REVIEW* When returning hide password data at response because
+      //if user web client receive new password this may be reason for few security vulnerable.
+      //Attacker can take new password data with arp poisoning attack
       async logInAsCustomer(data:LogInDto){
         //Try to get user from auth services.
         const user:Record<string,any>|null = await this.tryToGetUserWithEmail(data.mail,FirebaseColumns.CUSTOMERS);
