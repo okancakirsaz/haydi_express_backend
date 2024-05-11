@@ -1,9 +1,7 @@
-import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
-import { UserRecord } from "firebase-admin/auth";
+import { Injectable } from "@nestjs/common";
 import { BaseService } from "src/core/base/base_service";
 import { FirebaseColumns } from "src/core/constants/firebase_columns";
 import { RestaurantDto } from "src/core/dt_objects/user/restaurant.dto";
-import { LogInDto } from '../../../core/dt_objects/auth/log_in.dto';
 import { ForgotPasswordDto } from "src/core/dt_objects/auth/forgot_password.dto";
 import { MailServices } from "src/core/services/mail_services";
 import { ResetPasswordDto } from "src/core/dt_objects/auth/reset_password.dto";
@@ -11,8 +9,6 @@ import { MailVerificationRequestDto } from "src/core/dt_objects/auth/mail_verifi
 import { randomInt } from "crypto";
 import { MailVerificationDto } from "src/core/dt_objects/auth/mail_verification.dto";
 import { CustomerDto } from "src/core/dt_objects/user/customer.dto";
-import { CustomerAuthService } from "./customer_auth.service";
-import { RestaurantAuthService } from "./restaurant_auth.service";
 
 
 @Injectable()

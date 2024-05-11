@@ -1,6 +1,5 @@
 import { HttpException, HttpStatus } from "@nestjs/common";
 import { UserRecord } from "firebase-admin/auth";
-import { BaseService } from "src/core/base/base_service";
 import { FirebaseColumns } from "src/core/constants/firebase_columns";
 import { LogInDto } from "src/core/dt_objects/auth/log_in.dto";
 import { RestaurantDto } from "src/core/dt_objects/user/restaurant.dto";
@@ -13,6 +12,9 @@ export class RestaurantAuthService extends AuthService{
         data.uid = newUser.uid;
         data.nextPaymentDate = this.generateNewRestaurantNextPaymentDate(),
         await this.firebase.setData(FirebaseColumns.RESTAURANTS,data.uid,data);
+        //TODO: *REVIEW* When returning hide password data at response because
+        //if user web client receive new password this may be reason for few security vulnerable.
+        //Attacker can take new password data with arp poisoning attack
         return data;
         }
         else{

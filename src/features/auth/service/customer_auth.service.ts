@@ -1,4 +1,3 @@
-import { BaseService } from "src/core/base/base_service";
 import { AuthService } from "./auth.services";
 import { CustomerDto } from "src/core/dt_objects/user/customer.dto";
 import { FirebaseColumns } from "src/core/constants/firebase_columns";
@@ -16,6 +15,9 @@ export class CustomerAuthService extends AuthService{
          }
          else{
           await this.firebase.setData(FirebaseColumns.CUSTOMERS,params.uid,CustomerDto.toJson(params),);
+          //TODO: *REVIEW* When returning hide password data at response because
+          //if user web client receive new password this may be reason for few security vulnerable.
+          //Attacker can take new password data with arp poisoning attack
          return params;
          }
         } catch (error) {
