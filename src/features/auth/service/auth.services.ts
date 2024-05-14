@@ -9,6 +9,7 @@ import { MailVerificationRequestDto } from "src/core/dt_objects/auth/mail_verifi
 import { randomInt } from "crypto";
 import { MailVerificationDto } from "src/core/dt_objects/auth/mail_verification.dto";
 import { CustomerDto } from "src/core/dt_objects/user/customer.dto";
+import { LogInDto } from "src/core/dt_objects/auth/log_in.dto";
 
 
 @Injectable()
@@ -36,9 +37,6 @@ export class AuthService extends BaseService {
     }
 
 
-    //TODO: *REVIEW* When returning hide password data at response because
-    //if user web client receive new password this may be reason for few security vulnerable.
-    //Attacker can take new password data with arp poisoning attack
     async resetPassword(data:ResetPasswordDto,):Promise<ResetPasswordDto>{
         //user.uid=data.uid=requestCheck["uid"]
         const requestCheck:Record<string,string>= await this.firebase.getDoc(FirebaseColumns.PASSWORD_RESET_REQUESTS,data.uid);
@@ -56,6 +54,8 @@ export class AuthService extends BaseService {
         
         
         await this.firebase.deleteDoc(FirebaseColumns.PASSWORD_RESET_REQUESTS,user.uid);
+        //Attacker can take new password data with arp poisoning attack so we must hide the password
+        data.newPassword="";
         return data;
     }
 
@@ -99,6 +99,41 @@ export class AuthService extends BaseService {
       return params;
     }
 
+
+    async logIn(data:LogInDto,column:string){
+
+      //First check is user who want to log in is restaurant user.
+      const isUserRestaurant:boolean = column==FirebaseColumns.CUSTOMERS?false:true;
+
+      //Try to get user
+      const user:Record<string,any>|null = await this.tryToGetUserWithEmail(data.mail,column);
+
+      //If user does not exist in our db return false values. 
+      if(user == null){
+        data.isLoginSuccess=false;
+        data.unSuccessfulReason="Hatalı E-Posta";
+      }
+      
+      //If user already exist in our db check the password is true.
+      else{
+      const userFromDb:any = isUserRestaurant ? RestaurantDto.fromJson(user):CustomerDto.fromJson(user);
+      if(data.password==userFromDb.password){
+          data.isLoginSuccess = true;
+          data.uid = userFromDb.uid;
+
+          isUserRestaurant? data.restaurantData = userFromDb: data.customerData=userFromDb;
+
+          }
+          else{
+              data.isLoginSuccess=false;
+              data.unSuccessfulReason="Hatalı Şifre";
+          }
+      }
+
+      //Attacker can take new password data with arp poisoning attack so we must hide the password
+      data.password="";
+      return data;
+  }
 
 
     

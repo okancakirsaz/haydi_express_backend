@@ -28,7 +28,7 @@ export class AuthController{
     @Post("log-in-restaurant")
     async logInAsRestaurant(@Body() params:LogInDto){
         try {
-            return await this.restaurantService.logInAsRestaurant(params);
+            return await this.service.logIn(params,FirebaseColumns.RESTAURANTS);
         } catch (error) {
             throw Error(error)
         }
@@ -37,7 +37,7 @@ export class AuthController{
     @Post("log-in-customer")
     async logInAsCustomer(@Body() params:LogInDto){
         try {
-            return await this.customerService.logInAsCustomer(params);
+            return await this.service.logIn(params,FirebaseColumns.CUSTOMERS);
         } catch (error) {
             throw Error(error)
         }

@@ -12,9 +12,7 @@ export class RestaurantAuthService extends AuthService{
         data.uid = newUser.uid;
         data.nextPaymentDate = this.generateNewRestaurantNextPaymentDate(),
         await this.firebase.setData(FirebaseColumns.RESTAURANTS,data.uid,data);
-        //TODO: *REVIEW* When returning hide password data at response because
-        //if user web client receive new password this may be reason for few security vulnerable.
-        //Attacker can take new password data with arp poisoning attack
+        data.password="";
         return data;
         }
         else{
@@ -56,32 +54,4 @@ export class RestaurantAuthService extends AuthService{
              }
          );
      }
-
-     //TODO: Optimize it
-     async logInAsRestaurant(data:LogInDto){
-
-        //Try to get user
-        const user:Record<string,any>|null = await this.tryToGetUserWithEmail(data.mail,FirebaseColumns.RESTAURANTS);
-
-        //If user does not exist in our db return false values. 
-        if(user == null){
-          data.isLoginSuccess=false;
-          data.unSuccessfulReason="Hatalı E-Posta";
-        }
-        
-        //If user already exist in our db check the password from firestore(auth services does not share password with us).
-        else{
-        const userFromDb:RestaurantDto = RestaurantDto.fromJson(await this.firebase.getDoc(FirebaseColumns.RESTAURANTS,user.uid));
-        if(data.password==userFromDb.password){
-            data.isLoginSuccess = true;
-            data.uid = userFromDb.uid;
-            data.restaurantData = userFromDb;
-            }
-            else{
-                data.isLoginSuccess=false;
-                data.unSuccessfulReason="Hatalı Şifre";
-            }
-        }
-        return data;
-    }
 }
