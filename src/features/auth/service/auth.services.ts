@@ -124,19 +124,14 @@ export class AuthService extends BaseService {
       if(data.password==userFromDb.password){
           data.isLoginSuccess = true;
           data.uid = userFromDb.uid;
-
           isUserRestaurant? data.restaurantData = userFromDb: data.customerData=userFromDb;
-
+          data.accessToken = await this.jwtService.signAsync({email:data.mail,pass:data.password});
           }
           else{
               data.isLoginSuccess=false;
               data.unSuccessfulReason="Hatalı Şifre";
           }
       }
-
-      //Attacker can take important data with arp poisoning attack so we must hide the password
-      data.password="";
-      data.accessToken = await this.jwtService.signAsync({email:data.mail,pass:data.password});
       return data;
   }
 }
