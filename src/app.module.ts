@@ -4,10 +4,30 @@ import { AuthModule } from './features/auth/auth.module';
 import { MenuModule } from './features/menu/menu.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { CronjobServiceModule } from './core/services/cronjob_services/cronjob_module';
+import { JwtConstants } from './core/constants/jwt_constant';
+import { JwtModule } from '@nestjs/jwt';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
-  imports: [AuthModule,MenuModule,ScheduleModule.forRoot(),CronjobServiceModule],
+  imports: [AuthModule,MenuModule,ScheduleModule.forRoot(),CronjobServiceModule,
+    //For bearer token authentication
+    JwtModule.register({
+    global: true,
+    secret: new JwtConstants().secret,
+    //NOTE: You can set access token expire date
+  }),
+  //For rate limit
+  ThrottlerModule.forRoot([{
+    ttl: 60000,
+    limit: 30,
+  }]), 
+],
   controllers: [],
-  providers: [FirebaseServices],
+  providers: [FirebaseServices,{
+    provide: APP_GUARD,
+    useClass: ThrottlerGuard
+  }
+  ],
 })
 export class AppModule {}

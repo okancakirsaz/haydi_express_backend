@@ -9,6 +9,7 @@ export class LogInDto {
     restaurantData?:RestaurantDto
     customerData?:CustomerDto
     uid?:string
+    accessToken?:string
     
     static toJson(data: LogInDto): any {
       return {
@@ -18,7 +19,8 @@ export class LogInDto {
         "unSuccessfulReason":data.unSuccessfulReason,
         "restaurantData":RestaurantDto.toJson(data.restaurantData),
         "customerData":CustomerDto.toJson(data.customerData),
-        "uid":data.uid
+        "uid":data.uid,
+        "accessToken":data.accessToken
       };
     }
   
@@ -31,6 +33,7 @@ export class LogInDto {
       object.restaurantData = RestaurantDto.fromJson(data['restaurantData'])
       object.customerData = CustomerDto.fromJson(data['customerData'])
       object.uid=data["uid"];
+      object.accessToken=data["accessToken"];
       return object;
     }
   }

@@ -10,11 +10,15 @@ import { randomInt } from "crypto";
 import { MailVerificationDto } from "src/core/dt_objects/auth/mail_verification.dto";
 import { CustomerDto } from "src/core/dt_objects/user/customer.dto";
 import { LogInDto } from "src/core/dt_objects/auth/log_in.dto";
+import { JwtService } from "@nestjs/jwt";
 
 
 @Injectable()
 export class AuthService extends BaseService {
 
+    constructor(private readonly jwtService:JwtService) {
+      super();
+    }
     private mailService:MailServices = new MailServices();
 
     
@@ -130,11 +134,9 @@ export class AuthService extends BaseService {
           }
       }
 
-      //Attacker can take new password data with arp poisoning attack so we must hide the password
+      //Attacker can take important data with arp poisoning attack so we must hide the password
       data.password="";
+      data.accessToken = await this.jwtService.signAsync({email:data.mail,pass:data.password});
       return data;
   }
-
-
-    
 }

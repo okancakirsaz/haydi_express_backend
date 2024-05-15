@@ -1,8 +1,9 @@
-import { Body, Controller, Get, Post, Query, UploadedFile, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Get, Post, Query, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { MenuService } from "./menu.service";
 import { MenuDto } from "src/core/dt_objects/menu/menu.dto";
 import { FileInterceptor } from "@nestjs/platform-express/multer";
 import { DiscountDto } from "src/core/dt_objects/menu/discount.dto";
+import { AuthGuard } from "src/core/guard/auth.guard";
 
 
 
@@ -10,6 +11,8 @@ import { DiscountDto } from "src/core/dt_objects/menu/discount.dto";
 export class MenuController{
     constructor(private readonly service:MenuService){}
 
+
+    @UseGuards(AuthGuard)
     @Post('create-menu')
     @UseInterceptors(FileInterceptor('file'))
     async createMenu(@Body() params,@UploadedFile() file:Express.Multer.File):Promise<MenuDto>{
@@ -20,6 +23,7 @@ export class MenuController{
         }
     }
 
+    @UseGuards(AuthGuard)
     @Post('edit-menu')
     @UseInterceptors(FileInterceptor('file'))
     async editMenu(@Body() params,@UploadedFile() file:Express.Multer.File|null):Promise<MenuDto>{
@@ -30,6 +34,7 @@ export class MenuController{
         }
     }
 
+   
     @Get('get-restaurant-menu')
     async getRestaurantMenu(@Query("id") id:string){
         try {
@@ -39,6 +44,7 @@ export class MenuController{
         }
     }
 
+    @UseGuards(AuthGuard)
     @Post('add-discount')
     async addDiscount(@Body() params:DiscountDto):Promise<DiscountDto>{
         try {
@@ -48,6 +54,7 @@ export class MenuController{
         }
     }
 
+    @UseGuards(AuthGuard)
     @Get('cancel-campaign')
     async cancelCampaign(@Query("menuId") menuId:string):Promise<boolean>{
         try {
@@ -57,6 +64,7 @@ export class MenuController{
         }
     }
 
+    @UseGuards(AuthGuard)
     @Post('delete-menu')
     async deleteMenu(@Body() params:MenuDto):Promise<boolean>{
         try {
