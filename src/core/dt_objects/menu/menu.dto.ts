@@ -11,6 +11,7 @@ export class MenuDto{
     discountFinishDate?:string;
     menuId:string;
     stats:MenuStatsDto;
+    tags:string[]
 
     static toJson(data: MenuDto): any {
         return {
@@ -24,6 +25,7 @@ export class MenuDto{
           "discountFinishDate": data.discountFinishDate,
           "menuId":data.menuId,
           "stats":MenuStatsDto.toJson(data.stats),
+          "tags":data.tags,
         };
       }
     
@@ -39,6 +41,7 @@ export class MenuDto{
         object.discountFinishDate = data['discountFinishDate'];
         object.menuId=data["menuId"];
         object.stats=MenuStatsDto.fromJson(data["stats"]);
+        object.tags = data["tags"];
         return object;
       }
 }
