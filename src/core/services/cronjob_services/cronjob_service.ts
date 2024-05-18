@@ -12,6 +12,8 @@ export class CronjobService extends BaseService{
   @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
   async dailyCron() {
     await this.checkMenuCampaignsIsExpired();
+    //TODO:Test it
+    await this.checkMenuBoostIsExpired();
   }
   
   private async checkMenuCampaignsIsExpired() {
@@ -25,6 +27,20 @@ export class CronjobService extends BaseService{
             campaignAsDto.isOnDiscount=false;
             campaignAsDto.discountFinishDate=null;
             campaignAsDto.discountAmount=null;
+            await this.firebase.updateData(column,campaignAsDto.menuId,MenuDto.toJson(campaignAsDto));
+        }
+    }
+  }
+
+  private async checkMenuBoostIsExpired(){
+    //currentTime like this: '2024-02-12T18:28:18+03:00'
+    const currentDate:string = new Date().toISOString();
+    const column:string = FirebaseColumns.RESTAURANT_MENUS;
+    const campaignList = await this.firebase.getDataWithWhereQuery(column,"boostExpireDate","<=",currentDate);
+    if(campaignList!=null){
+        for(let i = 0;i<=campaignList.length-1;i++){
+            const campaignAsDto:MenuDto = MenuDto.fromJson(campaignList[i]);
+            campaignAsDto.boostExpireDate = null;
             await this.firebase.updateData(column,campaignAsDto.menuId,MenuDto.toJson(campaignAsDto));
         }
     }

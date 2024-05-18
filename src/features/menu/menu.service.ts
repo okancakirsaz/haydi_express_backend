@@ -5,7 +5,6 @@ import { DiscountDto } from "src/core/dt_objects/menu/discount.dto";
 import { MenuDto } from "src/core/dt_objects/menu/menu.dto";
 
 @Injectable()
-
 export class MenuService extends BaseService{
 
     async createMenu(params:MenuDto,file:Express.Multer.File):Promise<MenuDto>{

@@ -8,10 +8,12 @@ import { JwtConstants } from './core/constants/jwt_constant';
 import { JwtModule } from '@nestjs/jwt';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
+import { AdsModule } from './features/adversiment/ads.module';
 
 @Module({
-  imports: [AuthModule,MenuModule,ScheduleModule.forRoot(),CronjobServiceModule,
+  imports: [AuthModule,MenuModule,AdsModule, ScheduleModule.forRoot(),CronjobServiceModule,
     //For bearer token authentication
+    //TODO: *REVIEW* get from jwt_constants file this function
     JwtModule.register({
     global: true,
     secret: new JwtConstants().secret,

@@ -12,6 +12,8 @@ export class MenuDto{
     menuId:string;
     stats:MenuStatsDto;
     tags:string[]
+    boostExpireDate?:string;
+    
 
     static toJson(data: MenuDto): any {
         return {
@@ -26,6 +28,7 @@ export class MenuDto{
           "menuId":data.menuId,
           "stats":MenuStatsDto.toJson(data.stats),
           "tags":data.tags,
+          "boostExpireDate":data.boostExpireDate,
         };
       }
     
@@ -42,6 +45,7 @@ export class MenuDto{
         object.menuId=data["menuId"];
         object.stats=MenuStatsDto.fromJson(data["stats"]);
         object.tags = data["tags"];
+        object.boostExpireDate = data['boostExpireDate'];
         return object;
       }
 }
