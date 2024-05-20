@@ -12,7 +12,7 @@ export class CronjobService extends BaseService{
   @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
   async dailyCron() {
     await this.checkMenuCampaignsIsExpired();
-    //TODO:Test it
+    //TODO: Test it
     await this.checkMenuBoostIsExpired();
   }
   
@@ -42,6 +42,7 @@ export class CronjobService extends BaseService{
             const campaignAsDto:MenuDto = MenuDto.fromJson(campaignList[i]);
             campaignAsDto.boostExpireDate = null;
             await this.firebase.updateData(column,campaignAsDto.menuId,MenuDto.toJson(campaignAsDto));
+            await this.firebase.deleteDoc(FirebaseColumns.BOOSTED_MENUS,campaignAsDto.menuId);
         }
     }
   }

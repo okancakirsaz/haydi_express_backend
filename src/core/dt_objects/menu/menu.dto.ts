@@ -12,6 +12,7 @@ export class MenuDto{
     menuId:string;
     stats:MenuStatsDto;
     tags:string[]
+    restaurantName:string;
     boostExpireDate?:string;
     
 
@@ -29,6 +30,7 @@ export class MenuDto{
           "stats":MenuStatsDto.toJson(data.stats),
           "tags":data.tags,
           "boostExpireDate":data.boostExpireDate,
+          "restaurantName":data.restaurantName,
         };
       }
     
@@ -46,6 +48,7 @@ export class MenuDto{
         object.stats=MenuStatsDto.fromJson(data["stats"]);
         object.tags = data["tags"];
         object.boostExpireDate = data['boostExpireDate'];
+        object.restaurantName=data['restaurantName'];
         return object;
       }
 }

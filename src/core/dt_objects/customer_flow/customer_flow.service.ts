@@ -11,9 +11,10 @@ export class CustomerFlowService extends BaseService{
     private readonly flowCategories:FlowCategories = new FlowCategories();
 
 async getHaydiFirsatlar():Promise<MenuDto[]>{
-    const query:any[] = await this.firebase.getDataWithWhereQuery(FirebaseColumns.BOOSTED_MENUS,
+    const query:any[] = await this.firebase.getDataWithWhereQueryLimited(FirebaseColumns.BOOSTED_MENUS,
         "boostArea","==",
         this.flowCategories.haydiFirsatlar,
+        10
     );
     const queryAsDto:BoostMenuDto[] = query.map((e)=> BoostMenuDto.fromJson(e));
 
@@ -24,8 +25,10 @@ async getHaydiFirsatlar():Promise<MenuDto[]>{
             "menuId","==", queryAsDto[i].menuId);
         menuQuery.push(query[0]);
     }
-
-    const menuQueryAsDto:MenuDto[] = menuQuery.map((e)=>MenuDto.fromJson(e));
+    let menuQueryAsDto:MenuDto[] = [];
+    if(menuQuery.length!=0){
+      menuQueryAsDto =  menuQuery.map((e)=>MenuDto.fromJson(e))
+    }
     return menuQueryAsDto;
 }
 

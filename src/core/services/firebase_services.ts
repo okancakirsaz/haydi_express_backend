@@ -81,6 +81,23 @@ async getDataWithWhereQuery(column:string,whereKey:string,whereOperator:WhereFil
   }
 }
 
+async getDataWithWhereQueryLimited(column:string,whereKey:string,whereOperator:WhereFilterOp,whereValue:any,limit:number){
+  try {
+    const queryRequest = await this.db.collection(column).where(whereKey,whereOperator,whereValue).limit(limit).get();
+    const dataList = [];
+
+    for(let i=0;i<=queryRequest.docs.length-1;i++){
+      dataList.push(queryRequest.docs[i].data());
+    }
+   return dataList.length==0?null: dataList;
+  } catch (error) {
+    console.log(
+      `You have an error in query ${column} data\nThis is your error: `,
+      error
+    );
+  }
+}
+
 
 async uploadFileToStorage(collection:string,subCollection:string,refId:string,file:Express.Multer.File):Promise<string>{
   const storageRef = ref(
