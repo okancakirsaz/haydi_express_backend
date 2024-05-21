@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { BaseService } from 'src/core/base/base_service';
 import { FlowCategories } from 'src/core/constants/flow_categories';
-import { MenuDto } from '../menu/menu.dto';
+import { MenuDto } from '../../core/dt_objects/menu/menu.dto';
 import { FirebaseColumns } from 'src/core/constants/firebase_columns';
-import { BoostMenuDto } from '../advertisement/boost_menu.dto';
+import { BoostMenuDto } from '../../core/dt_objects/advertisement/boost_menu.dto';
 
 @Injectable()
 export class CustomerFlowService extends BaseService{
@@ -29,7 +29,18 @@ async getHaydiFirsatlar():Promise<MenuDto[]>{
     if(menuQuery.length!=0){
       menuQueryAsDto =  menuQuery.map((e)=>MenuDto.fromJson(e))
     }
-    return menuQueryAsDto;
+    return this.sortDatesByDistance(menuQueryAsDto);
+}
+
+
+private sortDatesByDistance(data:MenuDto[]):MenuDto[]{
+    //TODO: Works wrong. Fix it.
+    const now = new Date();
+    return data.sort((a, b) => {
+        const distanceA = new Date(a.boostExpireDate).getTime() - now.getTime();
+        const distanceB = new Date(b.boostExpireDate).getTime() - now.getTime();
+        return distanceA + distanceB;
+    });
 }
 
 }
