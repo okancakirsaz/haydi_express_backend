@@ -9,7 +9,7 @@ import { ref, uploadBytesResumable,getDownloadURL, getStorage, deleteObject } fr
 export class FirebaseServices{
 static instance:FirebaseServices = new FirebaseServices();
 private serviceAccountCredentials = serviceAccount as admin.ServiceAccount; 
-private db:Firestore;
+db:Firestore;
 private storage;
 private app:FirebaseApp;
 auth:Auth;

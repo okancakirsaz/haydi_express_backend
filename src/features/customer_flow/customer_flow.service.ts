@@ -40,4 +40,15 @@ private async fetchMenuFromBoosts(queryAsDto:BoostMenuDto[]){
 }
 
 
+async getMoreHaydiFirsatlar(lastExpire:string){
+    const queryRaw = await this.firebase.db.collection(FirebaseColumns.BOOSTED_MENUS)
+    .where("boostArea","==",this.flowCategories.haydiFirsatlar)
+    .where("expireDate","<",lastExpire)
+    .orderBy("expireDate","desc").limit(10).get();
+
+    const dataList:BoostMenuDto[] = queryRaw.docs.map(doc => BoostMenuDto.fromJson(doc.data()));
+    return this.fetchMenuFromBoosts(dataList);
+}
+
+
 }
