@@ -28,9 +28,10 @@ private async fetchMenuFromBoosts(queryAsDto:BoostMenuDto[]){
     for(let i = 0;i<=queryAsDto.length-1;i++){
         const query:any = await this.firebase.getDataWithWhereQuery(FirebaseColumns.RESTAURANT_MENUS,
             "menuId","==", queryAsDto[i].menuId,
-        );
+        ); 
         menuQuery.push(query[0]);
     }
+    console.log(menuQuery)
     let menuQueryAsDto:MenuDto[] = [];
     if(menuQuery.length!=0){
       menuQueryAsDto =  menuQuery.map((e)=>MenuDto.fromJson(e))
@@ -38,7 +39,6 @@ private async fetchMenuFromBoosts(queryAsDto:BoostMenuDto[]){
 
     return menuQueryAsDto;
 }
-
 
 async getMoreHaydiFirsatlar(lastExpire:string){
     const queryRaw = await this.firebase.db.collection(FirebaseColumns.BOOSTED_MENUS)
