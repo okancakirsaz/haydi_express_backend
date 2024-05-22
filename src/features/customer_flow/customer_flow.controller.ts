@@ -6,20 +6,20 @@ import { AuthGuard } from 'src/core/guard/auth.guard';
 export class CustomerFlowController{
 constructor(private readonly service:CustomerFlowService){}
 
-@Get("haydi-firsatlar")
-async getHaydiFirsatlar(){
+@Get("adverted-menu")
+async getHaydiFirsatlar(@Query("category") category:string){
     try {
-      return this.service.getHaydiFirsatlar();  
+      return this.service.getAdvertedMenus(category);  
     } catch (error) {
         throw Error();
     }
 }
 
 @UseGuards(AuthGuard)
-@Get("more-haydi-firsatlar")
-async getMoreHaydiFirsatlar(@Query("expire") expire:string){
+@Get("more-adverted-menu")
+async getMoreHaydiFirsatlar(@Query("expire") expire:string,@Query("category") category:string){
     try {
-      return this.service.getMoreHaydiFirsatlar(expire);  
+      return this.service.getMoreAdvertedMenus(expire,category);  
     } catch (error) {
         throw Error();
     }
