@@ -1,6 +1,6 @@
 import * as admin from "firebase-admin";
 import serviceAccount from "../../serviceAccountKey.json";
-import { Firestore, WhereFilterOp, getFirestore } from "firebase-admin/firestore";
+import { Firestore, OrderByDirection, WhereFilterOp, getFirestore } from "firebase-admin/firestore";
 import { Auth, getAuth } from "firebase-admin/auth";
 import { FirebaseApp, initializeApp } from "firebase/app";
 import { ref, uploadBytesResumable,getDownloadURL, getStorage, deleteObject } from "@firebase/storage";
@@ -90,6 +90,24 @@ async getDataWithWhereQueryLimited(column:string,whereKey:string,whereOperator:W
       dataList.push(queryRequest.docs[i].data());
     }
    return dataList.length==0?null: dataList;
+  } catch (error) {
+    console.log(
+      `You have an error in query ${column} data\nThis is your error: `,
+      error
+    );
+  }
+}
+
+async getDataWithOrderByAndWhereQueryLimited(
+  column:string,whereKey:string,
+  whereOperator:WhereFilterOp,whereValue:any,
+  orderByKey:string,sortType:OrderByDirection,
+  limit:number){
+  try {
+    const queryRequest = await this.db.collection(column).where(whereKey,whereOperator,whereValue).orderBy(orderByKey,sortType).limit(limit).get();
+    const dataList = queryRequest.docs.map(doc => doc.data());
+
+    return dataList.length === 0 ? null : dataList;
   } catch (error) {
     console.log(
       `You have an error in query ${column} data\nThis is your error: `,

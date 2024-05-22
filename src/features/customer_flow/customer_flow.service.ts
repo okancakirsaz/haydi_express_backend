@@ -11,36 +11,33 @@ export class CustomerFlowService extends BaseService{
     private readonly flowCategories:FlowCategories = new FlowCategories();
 
 async getHaydiFirsatlar():Promise<MenuDto[]>{
-    const query:any[] = await this.firebase.getDataWithWhereQueryLimited(FirebaseColumns.BOOSTED_MENUS,
-        "boostArea","==",
-        this.flowCategories.haydiFirsatlar,
+    const query:any[] = await this.firebase.getDataWithOrderByAndWhereQueryLimited(FirebaseColumns.BOOSTED_MENUS,
+        "boostArea","==",this.flowCategories.haydiFirsatlar,
+        "expireDate", "desc", 
         10
     );
     const queryAsDto:BoostMenuDto[] = query.map((e)=> BoostMenuDto.fromJson(e));
 
+    
+    return this.fetchMenuFromBoosts(queryAsDto);
+}
+
+private async fetchMenuFromBoosts(queryAsDto:BoostMenuDto[]){
     const menuQuery:any[] = [];
 
     for(let i = 0;i<=queryAsDto.length-1;i++){
         const query:any = await this.firebase.getDataWithWhereQuery(FirebaseColumns.RESTAURANT_MENUS,
-            "menuId","==", queryAsDto[i].menuId);
+            "menuId","==", queryAsDto[i].menuId,
+        );
         menuQuery.push(query[0]);
     }
     let menuQueryAsDto:MenuDto[] = [];
     if(menuQuery.length!=0){
       menuQueryAsDto =  menuQuery.map((e)=>MenuDto.fromJson(e))
     }
-    return this.sortDatesByDistance(menuQueryAsDto);
+
+    return menuQueryAsDto;
 }
 
-
-private sortDatesByDistance(data:MenuDto[]):MenuDto[]{
-    //TODO: Works wrong. Fix it.
-    const now = new Date();
-    return data.sort((a, b) => {
-        const distanceA = new Date(a.boostExpireDate).getTime() - now.getTime();
-        const distanceB = new Date(b.boostExpireDate).getTime() - now.getTime();
-        return distanceA + distanceB;
-    });
-}
 
 }

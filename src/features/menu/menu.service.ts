@@ -58,6 +58,7 @@ export class MenuService extends BaseService{
 
     async deleteMenu(params:MenuDto):Promise<boolean>{
        try {
+        await this.firebase.deleteDoc(FirebaseColumns.BOOSTED_MENUS,params.menuId);
         await this.firebase.deleteDoc(FirebaseColumns.RESTAURANT_MENUS,params.menuId);
         await this.firebase.deleteFileFromStorage(params.restaurantUid,"menu",params.menuId);
         return true;
