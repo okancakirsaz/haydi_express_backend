@@ -84,7 +84,7 @@ async getDataWithWhereQuery(column:string,whereKey:string,whereOperator:WhereFil
 async getDataWithWhereQueryLimited(column:string,whereKey:string,whereOperator:WhereFilterOp,whereValue:any,limit:number){
   try {
     const queryRequest = await this.db.collection(column).where(whereKey,whereOperator,whereValue).limit(limit).get();
-    const dataList = [];
+    const dataList:any[] = [];
 
     for(let i=0;i<=queryRequest.docs.length-1;i++){
       dataList.push(queryRequest.docs[i].data());

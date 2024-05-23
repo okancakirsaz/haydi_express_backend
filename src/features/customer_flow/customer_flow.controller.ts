@@ -7,21 +7,31 @@ export class CustomerFlowController{
 constructor(private readonly service:CustomerFlowService){}
 
 @Get("adverted-menu")
-async getHaydiFirsatlar(@Query("category") category:string){
+async getAdvertedMenus(@Query("category") category:string){
     try {
       return this.service.getAdvertedMenus(category);  
     } catch (error) {
-        throw Error();
+      throw Error();
     }
 }
 
 @UseGuards(AuthGuard)
 @Get("more-adverted-menu")
-async getMoreHaydiFirsatlar(@Query("expire") expire:string,@Query("category") category:string){
+async getMoreAdvertedMenus(@Query("expire") expire:string,@Query("category") category:string){
     try {
       return this.service.getMoreAdvertedMenus(expire,category);  
     } catch (error) {
-        throw Error();
+      throw Error();
+    }
+}
+
+@UseGuards(AuthGuard)
+@Get("discover")
+async discover(){
+    try {
+      return this.service.discover();  
+    } catch (error) {
+      throw Error();
     }
 }
 }
