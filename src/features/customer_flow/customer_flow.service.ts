@@ -90,7 +90,6 @@ private async getMenusFromLikeRatio(alreadyExistItems:MenuDto[]):Promise<MenuDto
     const existItems:string[] = this.setAlreadyExistItemsIdList(alreadyExistItems);
 
     dataAsDto= dataAsDto.filter((e)=>!existItems.includes(e.menuId));
-    //console.log(dataAsDto);
     return dataAsDto;
 }
 
