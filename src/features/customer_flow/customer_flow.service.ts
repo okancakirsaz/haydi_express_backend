@@ -100,5 +100,25 @@ data.push(alreadyExistItems[i].menuId);
 }
 return data;
 }
+
+
+async moreDiscover(likeRatio:string){
+
+    const parsedLikeRatio:number = Number.parseFloat(likeRatio)
+    const dbData =  await this.firebase.db.collection(FirebaseColumns.RESTAURANT_MENUS)
+    .where("boostExpireDate","==",null)
+    .where("stats.likeRatio","<",parsedLikeRatio)
+    .orderBy("stats.likeRatio","desc")
+    .limit(15)
+    .get();
+    const alreadyExistRestaurants:MenuDto[] = await this.getNewRestaurantsMenus();
+    const existItems:string[] = this.setAlreadyExistItemsIdList(alreadyExistRestaurants);
+    let menuData:MenuDto[]= dbData.docs.map((e)=>MenuDto.fromJson(e.data()));
+    menuData= menuData.filter((e)=>!existItems.includes(e.menuId));
+
+    return menuData;
+}
+
+
 }
 

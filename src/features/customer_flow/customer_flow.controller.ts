@@ -34,4 +34,15 @@ async discover(){
       throw Error();
     }
 }
+
+
+@UseGuards(AuthGuard)
+@Get("more-discover")
+async moreDiscover(@Query("likeRatio") likeRatio:string){
+    try {
+      return this.service.moreDiscover(likeRatio);  
+    } catch (error) {
+      throw Error();
+    }
+}
 }
