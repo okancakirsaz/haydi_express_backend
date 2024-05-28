@@ -49,6 +49,11 @@ async getDoc(column:string,doc:string){
   return (await this.db.collection(column).doc(doc).get()).data();
 }
 
+async getCollection(column:string){
+  const documents = (await this.db.collection(column).get()).docs;
+  return documents.map((e)=> e.data());
+}
+
 async deleteDoc(column:string,doc:string){
    await this.db.collection(column).doc(doc).delete();
 }

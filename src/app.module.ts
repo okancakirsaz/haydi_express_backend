@@ -10,9 +10,10 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { AdsModule } from './features/adversiment/ads.module';
 import { CustomerFlowModule } from './features/customer_flow/customer_flow.module';
+import { SearchModule } from './features/search/search.module';
 
 @Module({
-  imports: [AuthModule,MenuModule,AdsModule,CustomerFlowModule, ScheduleModule.forRoot(),CronjobServiceModule,
+  imports: [AuthModule,MenuModule,AdsModule,CustomerFlowModule,SearchModule,ScheduleModule.forRoot(),CronjobServiceModule,
     //For bearer token authentication
     //TODO: *REVIEW* get from jwt_constants file this function
     JwtModule.register({
