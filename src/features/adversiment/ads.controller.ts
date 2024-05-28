@@ -9,19 +9,9 @@ constructor(private readonly service:AdsService){}
 
 @UseGuards(AuthGuard)
 @Post("get-new-advertisement")
-async getNewAdvertisement(@Body() params:BoostRestaurantOrMenuDto):Promise<boolean>{
+async getNewAdvertisement(@Body() params:BoostRestaurantOrMenuDto):Promise<HttpException>{
     try {
     return this.service.getNewAdvertisement(params);
-    } catch (error) {
-    throw Error();
-    }
-}
-
-@UseGuards(AuthGuard)
-@Post("get-search-ad")
-async getNewSearchAdvertisement(@Body() params:BoostRestaurantOrMenuDto):Promise<HttpException>{
-    try {
-    return this.service.getNewSearchAdvertisement(params);
     } catch (error) {
     throw Error();
     }
