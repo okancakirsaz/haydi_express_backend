@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { BaseService } from 'src/core/base/base_service';
 import { MenuDto } from '../../core/dt_objects/menu/menu.dto';
 import { FirebaseColumns } from 'src/core/constants/firebase_columns';
-import { BoostMenuDto } from '../../core/dt_objects/advertisement/boost_menu.dto';
 import { RestaurantDto } from 'src/core/dt_objects/user/restaurant.dto';
+import { BoostRestaurantOrMenuDto } from 'src/core/dt_objects/advertisement/boost_restaurant_or_menu.dto';
 
 @Injectable()
 export class CustomerFlowService extends BaseService{
@@ -14,18 +14,18 @@ async getAdvertedMenus(category:string):Promise<MenuDto[]>{
         "expireDate", "desc", 
         10,
     );
-    const queryAsDto:BoostMenuDto[] = query.map((e)=> BoostMenuDto.fromJson(e));
+    const queryAsDto:BoostRestaurantOrMenuDto[] = query.map((e)=> BoostRestaurantOrMenuDto.fromJson(e));
 
     
     return this.fetchMenuFromBoosts(queryAsDto);
 }
 
-private async fetchMenuFromBoosts(queryAsDto:BoostMenuDto[]){
+private async fetchMenuFromBoosts(queryAsDto:BoostRestaurantOrMenuDto[]){
     const menuQuery:any[] = [];
 
     for(let i = 0;i<=queryAsDto.length-1;i++){
         const query:any = await this.firebase.getDataWithWhereQuery(FirebaseColumns.RESTAURANT_MENUS,
-            "menuId","==", queryAsDto[i].menuId,
+            "menuId","==", queryAsDto[i].elementId,
         ); 
         menuQuery.push(query[0]);
     }
@@ -43,7 +43,7 @@ async getMoreAdvertedMenus(lastExpire:string,category:string){
     .where("expireDate","<",lastExpire)
     .orderBy("expireDate","desc").limit(10).get();
 
-    const dataList:BoostMenuDto[] = queryRaw.docs.map(doc => BoostMenuDto.fromJson(doc.data()));
+    const dataList:BoostRestaurantOrMenuDto[] = queryRaw.docs.map(doc => BoostRestaurantOrMenuDto.fromJson(doc.data()));
     return this.fetchMenuFromBoosts(dataList);
 }
 

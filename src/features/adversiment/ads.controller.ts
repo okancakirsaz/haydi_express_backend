@@ -1,7 +1,6 @@
 import { Body, Controller, Get, HttpException, Post, Query, UseGuards, UseInterceptors } from '@nestjs/common';
 import { AdsService } from './ads.service';
 import { AuthGuard } from 'src/core/guard/auth.guard';
-import { BoostMenuDto } from 'src/core/dt_objects/advertisement/boost_menu.dto';
 import { BoostRestaurantOrMenuDto } from 'src/core/dt_objects/advertisement/boost_restaurant_or_menu.dto';
 
 @Controller('advertisement')
@@ -10,7 +9,7 @@ constructor(private readonly service:AdsService){}
 
 @UseGuards(AuthGuard)
 @Post("get-new-advertisement")
-async getNewAdvertisement(@Body() params:BoostMenuDto):Promise<boolean>{
+async getNewAdvertisement(@Body() params:BoostRestaurantOrMenuDto):Promise<boolean>{
     try {
     return this.service.getNewAdvertisement(params);
     } catch (error) {

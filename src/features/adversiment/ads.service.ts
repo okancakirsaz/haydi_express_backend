@@ -1,17 +1,19 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { BaseService } from 'src/core/base/base_service';
 import { FirebaseColumns } from 'src/core/constants/firebase_columns';
-import { BoostMenuDto } from 'src/core/dt_objects/advertisement/boost_menu.dto';
 import { MenuDto } from 'src/core/dt_objects/menu/menu.dto';
 import { BoostRestaurantOrMenuDto } from '../../core/dt_objects/advertisement/boost_restaurant_or_menu.dto';
 
 @Injectable()
 export class AdsService extends BaseService{
 
-    async getNewAdvertisement(params:BoostMenuDto):Promise<boolean>{
+    async getNewAdvertisement(params:BoostRestaurantOrMenuDto):Promise<boolean>{
         try {
-        await this.firebase.setData(FirebaseColumns.BOOSTED_MENUS,params.menuId,BoostMenuDto.toJson(params));
-        await this.setMenuExpireDate(params.menuId,params.expireDate);
+        const column:string = params.isRestaurant?FirebaseColumns.BOOSTED_RESTAURANTS:FirebaseColumns.BOOSTED_MENUS;
+        await this.firebase.setData(column,params.elementId,BoostRestaurantOrMenuDto.toJson(params));
+        if(!params.isRestaurant){
+            await this.setMenuExpireDate(params.elementId,params.expireDate);
+        }
         return true;
         } catch (_) {
             return false;
