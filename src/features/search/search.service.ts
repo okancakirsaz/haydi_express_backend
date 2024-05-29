@@ -24,19 +24,19 @@ export class SearchService extends BaseService{
     const dbData:BoostRestaurantOrMenuDto[] = dbDataRestaurants.concat(dbDataMenu);
       
     for(let i=0;i<=dbData.length-1;i++){
-    suggestionList.push(await this.fetchSuggestion(dbData[i]));
+    suggestionList.push(await this.fetchSuggestion(dbData[i].elementId,dbData[i].isRestaurant,true));
     }
     return suggestionList;
     
    } 
 
-   private async fetchSuggestion(data:BoostRestaurantOrMenuDto):Promise<SuggestionDto>{
+   private async fetchSuggestion(elementId:string,isRestaurant:boolean,isBoosted:boolean):Promise<SuggestionDto>{
     let suggestion:SuggestionDto=new SuggestionDto();
-    suggestion.elementId=data.elementId;
-    suggestion.isBoosted=true;
-    suggestion.isRestaurant = data.isRestaurant;
+    suggestion.elementId=elementId;
+    suggestion.isBoosted=isBoosted;
+    suggestion.isRestaurant = isRestaurant;
 
-    if(!data.isRestaurant){
+    if(!isRestaurant){
      const menu:MenuDto = MenuDto.fromJson(await this.firebase.getDoc(FirebaseColumns.RESTAURANT_MENUS,suggestion.elementId));
      suggestion.isOnDiscount=menu.isOnDiscount;
      suggestion.name=menu.name;
@@ -52,5 +52,63 @@ export class SearchService extends BaseService{
         suggestion.discountAmount=0;
     }
     return suggestion;
+   }
+
+
+   async search(keyword:string):Promise<SuggestionDto[]>{
+    const tagQueryResult:MenuDto[] = await this.queryByMenuTags(keyword);
+    const menuSuggestions:SuggestionDto[] = await this.fetchMenuListAsSuggestionList(tagQueryResult);
+    //const restaurantNameQueryResult:RestaurantDto[] = await this.queryByRestaurantName(keyword);
+    //const restaurantSuggestions:SuggestionDto[] = await this.fetchRestaurantListAsSuggestionList(restaurantNameQueryResult);
+
+    return menuSuggestions//.concat(restaurantSuggestions);
+   }
+
+   private async fetchMenuListAsSuggestionList(menuList:MenuDto[]):Promise<SuggestionDto[]>{
+    const data:SuggestionDto[] = [];
+    for(let i=0;i<=menuList.length-1;i++){
+        const menu:MenuDto = menuList[i];
+        data.push(await this.fetchSuggestion(menu.menuId,false,false));
+    }
+    return data;
+   }
+
+   private async fetchRestaurantListAsSuggestionList(restaurantList:RestaurantDto[]):Promise<SuggestionDto[]>{
+    const data:SuggestionDto[] = [];
+    for(let i=0;i<=restaurantList.length-1;i++){
+        const restaurant:RestaurantDto = restaurantList[i];
+        data.push(await this.fetchSuggestion(restaurant.uid,true,false));
+    }
+    return data;
+   }
+
+   private async queryByMenuTags(keyword:string):Promise<MenuDto[]>{
+    //All tags saved as lowercase to db. Not necessary to capitalize 
+    //TODO: Optimize algorithm
+    const response:Record<string,any>[] = await this.firebase
+    .getDataWithWhereQueryLimited(FirebaseColumns.RESTAURANT_MENUS,
+    "tags","array-contains-any",keyword,20
+    );
+    if(response!=null){
+        return response.map((e)=>MenuDto.fromJson(e));
+    }
+    else{
+        return [];
+    }
+   }
+
+   private async queryByRestaurantName(keyword:string):Promise<RestaurantDto[]>{
+    //Capitalize words for more truthy query
+    keyword=this.capitalizeWords(keyword);
+    const response:Record<string,any>[] = await this.firebase
+    .getDataWithWhereQueryLimited(FirebaseColumns.RESTAURANTS,
+    "businessName",">=",keyword,20
+    );
+    if(response!=null){
+        return response.map((e)=>RestaurantDto.fromJson(e));
+    }
+    else{
+        return [];
+    }
    }
 }

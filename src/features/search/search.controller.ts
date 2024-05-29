@@ -15,5 +15,16 @@ constructor(private readonly service:SearchService){}
         } catch (error) {
         throw Error();
         }
-  }  
+  }
+
+
+  @UseGuards(AuthGuard)
+  @Get("")
+  async search(@Query("keyword") keyword:string):Promise<SuggestionDto[]>{
+    try {
+        return await this.service.search(keyword);
+        } catch (error) {
+        throw Error();
+        }
+  } 
 }
