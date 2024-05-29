@@ -4,6 +4,7 @@ import { FirebaseColumns } from "src/core/constants/firebase_columns";
 import { FirebaseServices } from "../firebase_services";
 import { BaseService } from "src/core/base/base_service";
 import { MenuDto } from "src/core/dt_objects/menu/menu.dto";
+import { BoostRestaurantOrMenuDto } from "src/core/dt_objects/advertisement/boost_restaurant_or_menu.dto";
 
 
 @Injectable()
@@ -12,8 +13,8 @@ export class CronjobService extends BaseService{
   @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
   async dailyCron() {
     await this.checkMenuCampaignsIsExpired();
-    //TODO: Test it
     await this.checkMenuBoostIsExpired();
+    await this.checkRestaurantBoostIsExpired()
   }
   
   private async checkMenuCampaignsIsExpired() {
@@ -43,6 +44,19 @@ export class CronjobService extends BaseService{
             campaignAsDto.boostExpireDate = null;
             await this.firebase.updateData(column,campaignAsDto.menuId,MenuDto.toJson(campaignAsDto));
             await this.firebase.deleteDoc(FirebaseColumns.BOOSTED_MENUS,campaignAsDto.menuId);
+        }
+    }
+  }
+
+  private async checkRestaurantBoostIsExpired(){
+    //currentTime like this: '2024-02-12T18:28:18+03:00'
+    const currentDate:string = new Date().toISOString();
+    const column:string = FirebaseColumns.BOOSTED_RESTAURANTS;
+    const campaignList = await this.firebase.getDataWithWhereQuery(column,"expireDate","<=",currentDate);
+    if(campaignList!=null){
+        for(let i = 0;i<=campaignList.length-1;i++){
+            const campaignAsDto:BoostRestaurantOrMenuDto = BoostRestaurantOrMenuDto.fromJson(campaignList[i]);
+            await this.firebase.deleteDoc(FirebaseColumns.BOOSTED_RESTAURANTS,campaignAsDto.elementId);
         }
     }
   }

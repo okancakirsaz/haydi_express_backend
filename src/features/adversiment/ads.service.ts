@@ -44,6 +44,9 @@ export class AdsService extends BaseService{
         return new HttpException("Bu alana aynı anda birden fazla reklam alınamaz.",HttpStatus.CONFLICT);
         }
         await this.firebase.setData(column,params.elementId,BoostRestaurantOrMenuDto.toJson(params));
+        if(!params.isRestaurant){
+            await this.setMenuExpireDate(params.elementId,params.expireDate);
+        }
         return new HttpException("Reklam başarılı bir şekilde alındı.",HttpStatus.ACCEPTED);
     }
 
