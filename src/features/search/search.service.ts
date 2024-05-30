@@ -102,7 +102,8 @@ export class SearchService extends BaseService{
     keyword=this.capitalizeWords(keyword);
     const response:Record<string,any>[] = await this.firebase
     .getDataWithWhereQueryLimited(FirebaseColumns.RESTAURANTS,
-    "businessName",">=",keyword,20
+    //TODO: fix search bug
+    "businessName","array-contains-any",[...keyword],20
     );
     if(response!=null){
         return response.map((e)=>RestaurantDto.fromJson(e));
