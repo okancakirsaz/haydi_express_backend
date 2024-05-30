@@ -58,10 +58,10 @@ export class SearchService extends BaseService{
    async search(keyword:string):Promise<SuggestionDto[]>{
     const tagQueryResult:MenuDto[] = await this.queryByMenuTags(keyword);
     const menuSuggestions:SuggestionDto[] = await this.fetchMenuListAsSuggestionList(tagQueryResult);
-    //const restaurantNameQueryResult:RestaurantDto[] = await this.queryByRestaurantName(keyword);
-    //const restaurantSuggestions:SuggestionDto[] = await this.fetchRestaurantListAsSuggestionList(restaurantNameQueryResult);
+    const restaurantNameQueryResult:RestaurantDto[] = await this.queryByRestaurantName(keyword);
+    const restaurantSuggestions:SuggestionDto[] = await this.fetchRestaurantListAsSuggestionList(restaurantNameQueryResult);
 
-    return menuSuggestions//.concat(restaurantSuggestions);
+    return menuSuggestions.concat(restaurantSuggestions);
    }
 
    private async fetchMenuListAsSuggestionList(menuList:MenuDto[]):Promise<SuggestionDto[]>{
@@ -87,7 +87,7 @@ export class SearchService extends BaseService{
     //TODO: Optimize algorithm
     const response:Record<string,any>[] = await this.firebase
     .getDataWithWhereQueryLimited(FirebaseColumns.RESTAURANT_MENUS,
-    "tags","array-contains-any",keyword,20
+    "tags","array-contains",keyword,20
     );
     if(response!=null){
         return response.map((e)=>MenuDto.fromJson(e));
