@@ -54,7 +54,7 @@ export class SearchService extends BaseService{
     return suggestion;
    }
 
-
+    //TODO: Optimize algorithm with indexes and NLP
    async search(keyword:string):Promise<SuggestionDto[]>{
     const tagQueryResult:MenuDto[] = await this.queryByMenuTags(keyword);
     const menuSuggestions:SuggestionDto[] = await this.fetchMenuListAsSuggestionList(tagQueryResult);
@@ -84,7 +84,7 @@ export class SearchService extends BaseService{
 
    private async queryByMenuTags(keyword:string):Promise<MenuDto[]>{
     //All tags saved as lowercase to db. Not necessary to capitalize 
-    //TODO: Optimize algorithm
+   
     const response:Record<string,any>[] = await this.firebase
     .getDataWithWhereQueryLimited(FirebaseColumns.RESTAURANT_MENUS,
     "tags","array-contains",keyword,20
@@ -101,9 +101,9 @@ export class SearchService extends BaseService{
     //Capitalize words for more truthy query
     keyword=this.capitalizeWords(keyword);
     const response:Record<string,any>[] = await this.firebase
-    .getDataWithWhereQueryLimited(FirebaseColumns.RESTAURANTS,
-    //TODO: fix search bug
-    "businessName","array-contains-any",[...keyword],20
+    .getDataWithWhereQueryLimited(
+    FirebaseColumns.RESTAURANTS,
+    "businessName","==",keyword,20
     );
     if(response!=null){
         return response.map((e)=>RestaurantDto.fromJson(e));
