@@ -54,7 +54,6 @@ export class SearchService extends BaseService{
     return suggestion;
    }
 
-    //TODO: Optimize algorithm with indexes and NLP
    async search(keyword:string):Promise<SuggestionDto[]>{
     const tagQueryResult:MenuDto[] = await this.queryByMenuTags(keyword);
     const menuSuggestions:SuggestionDto[] = await this.fetchMenuListAsSuggestionList(tagQueryResult);
@@ -83,11 +82,11 @@ export class SearchService extends BaseService{
    }
 
    private async queryByMenuTags(keyword:string):Promise<MenuDto[]>{
-    //All tags saved as lowercase to db. Not necessary to capitalize 
-   
+    //All tags saved as lowercase to db on here because we don't fetch
+    //lowercase on restaurant search.
     const response:Record<string,any>[] = await this.firebase
     .getDataWithWhereQueryLimited(FirebaseColumns.RESTAURANT_MENUS,
-    "tags","array-contains",keyword,20
+    "tags","array-contains",keyword.toLowerCase(),20
     );
     if(response!=null){
         return response.map((e)=>MenuDto.fromJson(e));
@@ -98,15 +97,11 @@ export class SearchService extends BaseService{
    }
 
    private async queryByRestaurantName(keyword:string):Promise<RestaurantDto[]>{
-    //Capitalize words for more truthy query
-    keyword=this.capitalizeWords(keyword);
-    const response:Record<string,any>[] = await this.firebase
-    .getDataWithWhereQueryLimited(
-    FirebaseColumns.RESTAURANTS,
-    "businessName","==",keyword,20
-    );
+    const response= (await this.firebase.db.collection(FirebaseColumns.RESTAURANTS)
+    .where( "businessName",">=",keyword).where("businessName","<=",keyword+ '\uf8ff').get()).docs;
+    
     if(response!=null){
-        return response.map((e)=>RestaurantDto.fromJson(e));
+        return response.map((e)=>RestaurantDto.fromJson(e.data()));
     }
     else{
         return [];
