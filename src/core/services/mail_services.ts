@@ -2,17 +2,15 @@ import * as nodemailer from 'nodemailer';
 
 export class MailServices{
 
-    private readonly mailHostAddress:string = "ocairsaz@gmail.com";
+    private readonly mailHostAddress:string = "noreply@haydiekspres.com.tr";
 
      transporter = nodemailer.createTransport({
-        service:"Gmail",
-        host: 'smtp.gmail.com',
+        host: 'mail.haydiekspres.com.tr',
         port:465,
         secure:true,
         auth: {
-            //TODO:Change it
-            user: 'ocairsaz@gmail.com',
-            pass: 'thqh bljg micl oyxh'
+            user: 'noreply@haydiekspres.com.tr',
+            pass: 'xu1267*!A'
         }
     });
 
