@@ -12,7 +12,6 @@ constructor(private readonly service:AddressService){}
 @Post("create")
 async createAddress(@Body() params:AddressDto):Promise<boolean>{
     try {
-        console.log(params.name);
         return this.service.createAddress(params);
         } catch (error) {
         throw Error();
