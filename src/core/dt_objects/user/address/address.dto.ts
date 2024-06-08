@@ -29,8 +29,8 @@ export class AddressDto{
           "long":data.long,
           "isVerifiedFromCourier":data.isVerifiedFromCourier,
           "uid":data.uid,
-          "courierAddressDirection?":data.courierAddressDirection,
-          "addressOwner?":data.addressOwner,
+          "courierAddressDirection":data.courierAddressDirection,
+          "addressOwner":data.addressOwner,
         };
       }
     

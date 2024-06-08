@@ -12,7 +12,17 @@ constructor(private readonly service:AddressService){}
 @Post("create")
 async createAddress(@Body() params:AddressDto):Promise<boolean>{
     try {
-        return this.service.createAddress(params);
+        return await this.service.createAddress(params);
+        } catch (error) {
+        throw Error();
+        }
+}
+
+@UseGuards(AuthGuard)
+@Get("get-user-addresses")
+async getUserAddresses(@Query("userId") userId:string):Promise<AddressDto[]>{
+    try {
+        return await this.service.getUserAddresses(userId);
         } catch (error) {
         throw Error();
         }

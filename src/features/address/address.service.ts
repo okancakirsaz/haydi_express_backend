@@ -14,4 +14,12 @@ export class AddressService extends BaseService{
             return false;
         }
     }
+
+    async getUserAddresses(userId:string):Promise<AddressDto[]>{
+            const data:AddressDto[] =(await this.firebase
+                .getDataWithWhereQuery(FirebaseColumns.ADDRESSES,
+                "addressOwner","==",userId)??[]).map((e)=>AddressDto.fromJson(e));;
+            return data
+        
+    }
 }
