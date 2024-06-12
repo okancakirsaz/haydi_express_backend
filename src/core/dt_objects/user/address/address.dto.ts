@@ -6,6 +6,7 @@ export class AddressDto{
     street:string;
     buildingNumber:string;
     doorNumber:string;
+    floor:string;
     addressDirection:string;
     lat?:number;
     long?:number;
@@ -24,6 +25,7 @@ export class AddressDto{
           "street":data.street,
           "buildingNumber":data.buildingNumber,
           "doorNumber": data.doorNumber,
+          "floor":data.floor,
           "addressDirection":data.addressDirection,
           "lat": data.lat,
           "long":data.long,
@@ -43,6 +45,7 @@ export class AddressDto{
         object.street=data["street"];
         object.buildingNumber=data["buildingNumber"];
         object.doorNumber = data['doorNumber'];
+        object.floor = data['floor'];
         object.addressDirection = data["addressDirection"];
         object.lat = data['lat'];
         object.long=data["long"];

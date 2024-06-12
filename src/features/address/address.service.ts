@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { BaseService } from 'src/core/base/base_service';
 import { FirebaseColumns } from 'src/core/constants/firebase_columns';
 import { AddressDto } from 'src/core/dt_objects/user/address/address.dto';
@@ -22,4 +22,14 @@ export class AddressService extends BaseService{
             return data
         
     }
+
+    async deleteAddress(id:string):Promise<boolean>{
+       try {
+        await this.firebase.deleteDoc(FirebaseColumns.ADDRESSES,id);
+        return true;
+       } catch (error) {
+        return false;
+       }
+    
+}
 }
