@@ -19,6 +19,16 @@ async createAddress(@Body() params:AddressDto):Promise<boolean>{
 }
 
 @UseGuards(AuthGuard)
+@Post("edit")
+async editAddress(@Body() params:AddressDto):Promise<boolean>{
+    try {
+        return await this.service.editAddress(params);
+        } catch (error) {
+        throw Error();
+        }
+}
+
+@UseGuards(AuthGuard)
 @Get("get-user-addresses")
 async getUserAddresses(@Query("userId") userId:string):Promise<AddressDto[]>{
     try {

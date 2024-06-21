@@ -15,6 +15,15 @@ export class AddressService extends BaseService{
         }
     }
 
+    async editAddress(params:AddressDto):Promise<boolean>{
+        try {
+            await this.firebase.updateData(FirebaseColumns.ADDRESSES,params.uid,AddressDto.toJson(params));
+        return true;
+        } catch (error) {
+            return false;
+        }
+    }
+
     async getUserAddresses(userId:string):Promise<AddressDto[]>{
             const data:AddressDto[] =(await this.firebase
                 .getDataWithWhereQuery(FirebaseColumns.ADDRESSES,
