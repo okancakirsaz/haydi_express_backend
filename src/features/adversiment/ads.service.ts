@@ -39,7 +39,7 @@ export class AdsService extends BaseService{
     }
 
     private async getNewSearchAdvertisement(params:BoostRestaurantOrMenuDto,column:string):Promise<HttpException>{
-        const isRestaurantExist:boolean = await this.checkIsRestaurantExist(column,params.restaurantId);
+        const isRestaurantExist:boolean = await this.checkIsRestaurantExist(params.restaurantId);
         if(isRestaurantExist){
         return new HttpException("Bu alana aynı anda birden fazla reklam alınamaz.",HttpStatus.CONFLICT);
         }
@@ -50,7 +50,7 @@ export class AdsService extends BaseService{
         return new HttpException("Reklam başarılı bir şekilde alındı.",HttpStatus.ACCEPTED);
     }
 
-    private async  checkIsRestaurantExist(column:string,restaurantId:string):Promise<boolean>{
+    private async  checkIsRestaurantExist(restaurantId:string):Promise<boolean>{
         const boostedRestaurants = await this.firebase.getDataWithWhereQuery(FirebaseColumns.BOOSTED_RESTAURANTS,"restaurantId","==",restaurantId)??[];
         const boostedMenus = await this.firebase.getDataWithWhereQuery(FirebaseColumns.BOOSTED_MENUS,"restaurantId","==",restaurantId)??[];
 
