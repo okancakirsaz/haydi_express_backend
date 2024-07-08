@@ -112,11 +112,10 @@ export class MenuService extends BaseService {
   }
 
 
-  //TODO: Add menuId equalizer to similar foods api req
-  //TODO: Fix null response error problem
-  async getSimilarFoods(tags: string[]): Promise<MenuDto[]> {
+
+  async getSimilarFoods(tags: string[],menuId:string): Promise<MenuDto[]> {
     let finalRawData = [];
-    for (let i = 0; i <= tags.length - 1; i++) {
+    for (let i:number = 0; i <= tags.length - 1; i++) {
       const response: Record<string, any>[] =
         await this.firebase.getDataWithWhereQueryLimited(
           FirebaseColumns.RESTAURANT_MENUS,
@@ -124,10 +123,12 @@ export class MenuService extends BaseService {
           'array-contains',
           tags[i],
           2,
-        );
-        
-      finalRawData =finalRawData.concat(response);
-      
+        )??[];  
+      for(let j:number = 0;j<=response.length-1;j++){
+        if(response[j]!=null&&response[j]["menuId"]!=menuId){
+          finalRawData.push(response[j]);
+        }
+      }
     }
     return finalRawData.map((e)=>MenuDto.fromJson(e));
   }

@@ -74,10 +74,10 @@ export class MenuController{
 
     @UseGuards(AuthGuard)
     @Get('get-similar-foods')
-    async getSimilarFoods(@Query("tags") tags:string):Promise<MenuDto[]>{
+    async getSimilarFoods(@Query("tags") tags:string,@Query("menuId") menuId:string):Promise<MenuDto[]>{
         try {
            
-            return await this.service.getSimilarFoods(JSON.parse(tags));
+            return await this.service.getSimilarFoods(JSON.parse(tags),menuId);
         } catch (error) {
             throw Error(error);
         }
