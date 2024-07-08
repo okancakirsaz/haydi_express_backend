@@ -81,7 +81,7 @@ export class SearchService extends BaseService{
     return data;
    }
 
-   private async queryByMenuTags(keyword:string):Promise<MenuDto[]>{
+   public async queryByMenuTags(keyword:string):Promise<MenuDto[]>{
     //All tags saved as lowercase to db on here because we don't fetch
     //lowercase on restaurant search.
     const response:Record<string,any>[] = await this.firebase

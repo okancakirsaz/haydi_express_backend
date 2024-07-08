@@ -5,8 +5,6 @@ import { FileInterceptor } from "@nestjs/platform-express/multer";
 import { DiscountDto } from "src/core/dt_objects/menu/discount.dto";
 import { AuthGuard } from "src/core/guard/auth.guard";
 
-
-
 @Controller('menu')
 export class MenuController{
     constructor(private readonly service:MenuService){}
@@ -69,6 +67,17 @@ export class MenuController{
     async deleteMenu(@Body() params:MenuDto):Promise<boolean>{
         try {
             return await this.service.deleteMenu(params);
+        } catch (error) {
+            throw Error(error);
+        }
+    }
+
+    @UseGuards(AuthGuard)
+    @Get('get-similar-foods')
+    async getSimilarFoods(@Query("tags") tags:string):Promise<MenuDto[]>{
+        try {
+           
+            return await this.service.getSimilarFoods(JSON.parse(tags));
         } catch (error) {
             throw Error(error);
         }
