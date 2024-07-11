@@ -11,9 +11,10 @@ import { AdsModule } from './features/adversiment/ads.module';
 import { CustomerFlowModule } from './features/customer_flow/customer_flow.module';
 import { SearchModule } from './features/search/search.module';
 import { AddressModule } from './features/address/address.module';
+import { OrderModule } from './features/create_order/order.module';
 
 @Module({
-  imports: [AuthModule,MenuModule,AdsModule,CustomerFlowModule,SearchModule, 
+  imports: [AuthModule,MenuModule,AdsModule,CustomerFlowModule,SearchModule,OrderModule,
     AddressModule,
     ScheduleModule.forRoot(),CronjobServiceModule,
     //For bearer token authentication
