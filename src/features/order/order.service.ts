@@ -5,9 +5,14 @@ import { OrderDto } from 'src/core/dt_objects/order/order.dto';
 import { RestaurantDto } from 'src/core/dt_objects/user/restaurant.dto';
 import {PaymentMethods} from 'src/core/constants/payment_methods';
 import { PaymentDto } from 'src/core/dt_objects/order/payment.dto';
+import { OrderGateway } from './order_gateway';
 
 @Injectable()
 export class OrderService extends BaseService{
+
+    constructor(private readonly gateway:OrderGateway){
+        super();
+    }
 
     async isRestaurantsUsesHe(ids:string[]):Promise<boolean[]>{
         let finalValue:boolean[] = [];
@@ -34,6 +39,7 @@ export class OrderService extends BaseService{
               return await this.onlinePaymentProcess(params);
             }
             else{
+                this.newOrderStream(params);
                 return true;
             }
         } catch (error) {
@@ -41,6 +47,13 @@ export class OrderService extends BaseService{
             return new HttpException("Bilinmeyen bir hata oluştu.",HttpStatus.BAD_GATEWAY);
         }
 
+    }
+
+     newOrderStream(params:OrderDto){
+        //TODO: Add operation panel part
+        
+            this.gateway.newRestaurantOrder(params,params.restaurantId);
+        
     }
 
     private async getPaid(paymentData:PaymentDto):Promise<boolean|HttpException>{
@@ -57,6 +70,7 @@ export class OrderService extends BaseService{
         if(isPaidSuccess==true){
             params.isPaidSuccess=isPaidSuccess as boolean;
             await this.firebase.updateData(column,params.orderId,OrderDto.toJson(params));
+            this.newOrderStream(params);
             return true;
         }
         else{

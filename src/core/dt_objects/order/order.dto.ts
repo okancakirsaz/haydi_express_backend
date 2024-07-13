@@ -12,6 +12,7 @@ export class OrderDto{
     orderCreationDate:string;
     customerName:string;
     customerId:string;
+    restaurantId:string;
     customerPhoneNumber:string;
     note:string;
     isPaidSuccess?:boolean;
@@ -29,6 +30,7 @@ export class OrderDto{
           "orderCreationDate":data.orderCreationDate,
           "customerName": data.customerName,
           "customerId": data.customerId,
+          "restaurantId": data.restaurantId,
           "customerPhoneNumber":data.customerPhoneNumber,
           "note":data.note,
           "isPaidSuccess":data.isPaidSuccess,
@@ -47,6 +49,7 @@ export class OrderDto{
         object.orderCreationDate = data["orderCreationDate"];
         object.customerName = data['customerName'];
         object.customerId = data['customerId'];
+        object.restaurantId = data['restaurantId'];
         object.customerPhoneNumber=data["customerPhoneNumber"];
         object.note = data["note"];
         object.isPaidSuccess=data['isPaidSuccess'];

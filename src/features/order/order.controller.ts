@@ -2,6 +2,7 @@ import { Body, Controller, Get, HttpException, Post, Query, UseGuards, UseInterc
 import { OrderService } from './order.service';
 import { AuthGuard } from 'src/core/guard/auth.guard';
 import { OrderDto } from 'src/core/dt_objects/order/order.dto';
+import { OrderGateway } from './order_gateway';
 
 @Controller('order')
 export class OrderController{
