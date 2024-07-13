@@ -1,12 +1,13 @@
 import { MenuDto } from "../menu/menu.dto";
 import { AddressDto } from "../user/address/address.dto";
+import { BucketElementDto } from "./bucket_element.dto";
 import { PaymentDto } from "./payment.dto";
 
 export class OrderDto{
     orderId:string;
     paymentData:PaymentDto;
     addressData:AddressDto;
-    menuData:MenuDto[];
+    menuData:BucketElementDto[];
     paymentMethod:string;
     orderState:string;
     orderCreationDate:string;
@@ -24,7 +25,7 @@ export class OrderDto{
           "orderId": data.orderId,
           "paymentData":PaymentDto.toJson(data.paymentData),
           "addressData": AddressDto.toJson(data.addressData),
-          "menuData":data.menuData.map((e)=>MenuDto.toJson(e)),
+          "menuData":data.menuData.map((e)=>BucketElementDto.toJson(e)),
           "paymentMethod":data.paymentMethod,
           "orderState": data.orderState,
           "orderCreationDate":data.orderCreationDate,
@@ -43,7 +44,7 @@ export class OrderDto{
         object.orderId = data['orderId'];
         object.paymentData = PaymentDto.fromJson(data["paymentData"]);
         object.addressData = AddressDto.fromJson(data['addressData']);
-        object.menuData=data["menuData"].map((e)=>MenuDto.fromJson(e));
+        object.menuData=data["menuData"].map((e)=>BucketElementDto.fromJson(e));
         object.paymentMethod=data["paymentMethod"];
         object.orderState = data['orderState'];
         object.orderCreationDate = data["orderCreationDate"];
