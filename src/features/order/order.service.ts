@@ -78,4 +78,17 @@ export class OrderService extends BaseService{
             return isPaidSuccess as HttpException;
         }
     }
+
+
+    async restaurantActiveOrders(restaurantId:string):Promise<OrderDto[]>{
+        const dbQuery = await this.firebase.getDataWithWhereQuery(FirebaseColumns.ORDERS,"restaurantId","==",restaurantId);
+        const transportedQuery:OrderDto[] = dbQuery.map((e)=>OrderDto.fromJson(e));
+        const filteredQuery:OrderDto[] = transportedQuery.filter((e)=>{
+            if(e.isPaidSuccess==null||e.isPaidSuccess){
+                return e;
+            }
+        });
+
+        return filteredQuery;
+    }
 }

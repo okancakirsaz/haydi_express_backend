@@ -25,4 +25,14 @@ async createOrder(@Body() params:OrderDto):Promise<boolean|HttpException>{
         throw Error(error);
     }
 }
+
+@UseGuards(AuthGuard)
+@Get("restaurant-active-orders")
+async restaurantActiveOrders(@Query("restaurantId") restaurantId:string):Promise<OrderDto[]>{
+    try {
+      return this.service.restaurantActiveOrders(restaurantId);  
+    } catch (error) {
+      throw Error();
+    }
+}
 }
