@@ -1,8 +1,7 @@
-import { Body, Controller, Get, HttpException, Post, Query, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, Post, Query, UseGuards } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { AuthGuard } from 'src/core/guard/auth.guard';
 import { OrderDto } from 'src/core/dt_objects/order/order.dto';
-import { OrderGateway } from './order_gateway';
 
 @Controller('order')
 export class OrderController{
@@ -33,6 +32,16 @@ async restaurantActiveOrders(@Query("restaurantId") restaurantId:string):Promise
       return this.service.restaurantActiveOrders(restaurantId);  
     } catch (error) {
       throw Error();
+    }
+}
+
+@UseGuards(AuthGuard)
+@Post('update-order-state')
+async updateOrderState(@Body() params:OrderDto):Promise<boolean|HttpException>{
+    try {
+        return await this.service.updateOrderState(params);
+    } catch (error) {
+        throw Error(error);
     }
 }
 }

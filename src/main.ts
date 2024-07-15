@@ -4,11 +4,13 @@ import { AppModule } from './app.module';
 import { json } from 'express';
 import { SwaggerSettings } from './core/constants/swagger_settings';
 import { SwaggerModule } from '@nestjs/swagger';
+import { LogDatabaseService } from './core/services/log_database_service';
 
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   FirebaseServices.instance.initApp();
+  LogDatabaseService.instance.initApp();
 
   const swaggerSettings:SwaggerSettings = new SwaggerSettings(app);
   SwaggerModule.setup('api', app, swaggerSettings.document);

@@ -11,4 +11,8 @@ public server;
 newRestaurantOrder(@MessageBody() body:OrderDto,restaurantId:string){
     this.server.emit(`New Order:${restaurantId}`,OrderDto.toJson(body));
 }
+
+orderUpdate(@MessageBody() body:OrderDto,orderId:string){
+    this.server.emit(orderId,OrderDto.toJson(body));
+}
 }
