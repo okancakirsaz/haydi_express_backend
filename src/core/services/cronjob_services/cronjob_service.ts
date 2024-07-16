@@ -5,6 +5,7 @@ import { FirebaseServices } from "../firebase_services";
 import { BaseService } from "src/core/base/base_service";
 import { MenuDto } from "src/core/dt_objects/menu/menu.dto";
 import { BoostRestaurantOrMenuDto } from "src/core/dt_objects/advertisement/boost_restaurant_or_menu.dto";
+import { CancelOrderDto } from "src/core/dt_objects/order/cancel_order.dto";
 
 
 @Injectable()
@@ -14,7 +15,8 @@ export class CronjobService extends BaseService{
   async dailyCron() {
     await this.checkMenuCampaignsIsExpired();
     await this.checkMenuBoostIsExpired();
-    await this.checkRestaurantBoostIsExpired()
+    await this.checkRestaurantBoostIsExpired();
+    await this.clearCancelledOrders();
   }
   
   private async checkMenuCampaignsIsExpired() {
@@ -58,6 +60,13 @@ export class CronjobService extends BaseService{
             const campaignAsDto:BoostRestaurantOrMenuDto = BoostRestaurantOrMenuDto.fromJson(campaignList[i]);
             await this.firebase.deleteDoc(FirebaseColumns.BOOSTED_RESTAURANTS,campaignAsDto.elementId);
         }
+    }
+  }
+
+  private async clearCancelledOrders(){
+   const docs:CancelOrderDto[] =await (await this.firebase.getCollection(FirebaseColumns.CANCELLED_ORDERS)).map((e)=>CancelOrderDto.fromJson(e));
+    for(let i:number =0;i<=docs.length-1;i++){
+      await this.firebase.deleteDoc(FirebaseColumns.CANCELLED_ORDERS,docs[i].order.orderId);
     }
   }
 

@@ -2,6 +2,7 @@ import { Body, Controller, Get, HttpException, Post, Query, UseGuards } from '@n
 import { OrderService } from './order.service';
 import { AuthGuard } from 'src/core/guard/auth.guard';
 import { OrderDto } from 'src/core/dt_objects/order/order.dto';
+import { CancelOrderDto } from 'src/core/dt_objects/order/cancel_order.dto';
 
 @Controller('order')
 export class OrderController{
@@ -40,6 +41,26 @@ async restaurantActiveOrders(@Query("restaurantId") restaurantId:string):Promise
 async updateOrderState(@Body() params:OrderDto):Promise<boolean|HttpException>{
     try {
         return await this.service.updateOrderState(params);
+    } catch (error) {
+        throw Error(error);
+    }
+}
+
+@UseGuards(AuthGuard)
+@Get("restaurant-order-logs")
+async getOrderLogs(@Query("restaurantId") restaurantId:string,@Query("dateRange") dateRange:string):Promise<OrderDto[]>{
+    try {
+      return await this.service.getOrderLogs(restaurantId,JSON.parse(dateRange));  
+    } catch (error) {
+      throw Error();
+    }
+}
+
+@UseGuards(AuthGuard)
+@Post('cancel-order')
+async cancelOrder(@Body() params:CancelOrderDto):Promise<boolean|HttpException>{
+    try {
+        return await this.service.cancelOrder(params);
     } catch (error) {
         throw Error(error);
     }
