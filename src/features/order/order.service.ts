@@ -154,8 +154,6 @@ export class OrderService extends BaseService {
   ): Promise<boolean | HttpException> {
     try {
       await this.logDatabase.db
-        .collection(order.restaurantId)
-        .doc('LOGS')
         .collection(FirebaseColumns.ORDERS)
         .doc(order.orderId)
         .set(OrderDto.toJson(order));
@@ -169,16 +167,18 @@ export class OrderService extends BaseService {
   }
 
   async getOrderLogs(restaurantId: string,dateRange:string[]): Promise<OrderDto[]> {
-    const response: any[] =
+   
+      const response: any[] =
       (
         await this.logDatabase.db
-          .collection(restaurantId)
-          .doc('LOGS')
-          .collection(FirebaseColumns.ORDERS).where("orderCreationDate",">=",dateRange[0]).where("orderCreationDate","<=",dateRange[1])
+          .collection(FirebaseColumns.ORDERS).where("restaurantId","==",restaurantId)
+          .where("orderCreationDate",">=",dateRange[0]).where("orderCreationDate","<=",dateRange[1])
           .get()
       ).docs ?? [];
+      return response.map((e) => OrderDto.fromJson(e.data()));
+    
 
-    return response.map((e) => OrderDto.fromJson(e.data()));
+   
   }
 
   async cancelOrder(params:CancelOrderDto):Promise<boolean | HttpException>{
