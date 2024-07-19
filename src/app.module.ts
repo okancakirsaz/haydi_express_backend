@@ -12,9 +12,10 @@ import { CustomerFlowModule } from './features/customer_flow/customer_flow.modul
 import { SearchModule } from './features/search/search.module';
 import { AddressModule } from './features/address/address.module';
 import { OrderModule } from './features/order/order.module';
+import { CustomerModule } from './features/user/customer/customer.module';
 
 @Module({
-  imports: [AuthModule,MenuModule,AdsModule,CustomerFlowModule,SearchModule,OrderModule,
+  imports: [AuthModule,MenuModule,AdsModule,CustomerFlowModule,SearchModule,OrderModule,CustomerModule,
     AddressModule,
     ScheduleModule.forRoot(),CronjobServiceModule,
     //For bearer token authentication

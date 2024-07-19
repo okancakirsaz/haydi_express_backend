@@ -37,6 +37,16 @@ async restaurantActiveOrders(@Query("restaurantId") restaurantId:string):Promise
 }
 
 @UseGuards(AuthGuard)
+@Get("customer-active-orders")
+async customerActiveOrders(@Query("customerId") customerId:string):Promise<OrderDto[]>{
+    try {
+      return this.service.customerActiveOrders(customerId);  
+    } catch (error) {
+      throw Error();
+    }
+}
+
+@UseGuards(AuthGuard)
 @Post('update-order-state')
 async updateOrderState(@Body() params:OrderDto):Promise<boolean|HttpException>{
     try {
@@ -51,6 +61,16 @@ async updateOrderState(@Body() params:OrderDto):Promise<boolean|HttpException>{
 async getOrderLogs(@Query("restaurantId") restaurantId:string,@Query("dateRange") dateRange:string):Promise<OrderDto[]>{
     try {
       return await this.service.getOrderLogs(restaurantId,JSON.parse(dateRange));  
+    } catch (error) {
+      throw Error();
+    }
+}
+
+@UseGuards(AuthGuard)
+@Get("customer-order-logs")
+async getOrderLogsForCustomer(@Query("restaurantId") restaurantId:string):Promise<OrderDto[]>{
+    try {
+      return await this.service.getOrderLogsForCustomer(restaurantId);  
     } catch (error) {
       throw Error();
     }

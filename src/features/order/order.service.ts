@@ -97,13 +97,36 @@ export class OrderService extends BaseService {
     }
   }
 
-  async restaurantActiveOrders(restaurantId: string): Promise<OrderDto[]> {
+  async restaurantActiveOrders(restaurantId:string): Promise<OrderDto[]> {
     const dbQuery: any[] =
       (await this.firebase.getDataWithWhereQuery(
         FirebaseColumns.ORDERS,
         'restaurantId',
         '==',
         restaurantId,
+      )) ?? [];
+    if (dbQuery.length != 0) {
+      const transportedQuery: OrderDto[] = dbQuery.map((e) =>
+        OrderDto.fromJson(e),
+      );
+      const filteredQuery: OrderDto[] = transportedQuery.filter((e) => {
+        if (e.isPaidSuccess == null || e.isPaidSuccess) {
+          return e;
+        }
+      });
+      return filteredQuery;
+    } else {
+      return [];
+    }
+  }
+
+  async customerActiveOrders(customerId:string): Promise<OrderDto[]> {
+    const dbQuery: any[] =
+      (await this.firebase.getDataWithWhereQuery(
+        FirebaseColumns.ORDERS,
+        'customerId',
+        '==',
+        customerId,
       )) ?? [];
     if (dbQuery.length != 0) {
       const transportedQuery: OrderDto[] = dbQuery.map((e) =>
@@ -176,10 +199,18 @@ export class OrderService extends BaseService {
           .get()
       ).docs ?? [];
       return response.map((e) => OrderDto.fromJson(e.data()));
-    
-
-   
   }
+
+  async getOrderLogsForCustomer(customerId:string): Promise<OrderDto[]> {
+   
+    const response: any[] =
+    (
+      await this.logDatabase.db
+        .collection(FirebaseColumns.ORDERS).where("customerId","==",customerId)
+        .get()
+    ).docs ?? [];
+    return response.map((e) => OrderDto.fromJson(e.data()));
+}
 
   async cancelOrder(params:CancelOrderDto):Promise<boolean | HttpException>{
     try {
