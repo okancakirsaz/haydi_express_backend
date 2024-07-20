@@ -5,7 +5,7 @@ import { OrderDto } from 'src/core/dt_objects/order/order.dto';
 import { RestaurantDto } from 'src/core/dt_objects/user/restaurant.dto';
 import { PaymentMethods } from 'src/core/constants/payment_methods';
 import { PaymentDto } from 'src/core/dt_objects/order/payment.dto';
-import { OrderGateway } from './order_gateway';
+import { OrderGateway } from './order.gateway';
 import { params } from 'firebase-functions/v1';
 import { CancelOrderDto } from 'src/core/dt_objects/order/cancel_order.dto';
 

@@ -13,9 +13,11 @@ import { SearchModule } from './features/search/search.module';
 import { AddressModule } from './features/address/address.module';
 import { OrderModule } from './features/order/order.module';
 import { CustomerModule } from './features/user/customer/customer.module';
+import { ChatModule } from './features/chat/chat.module';
+import { BaseGateway } from './core/base/base.gateway';
 
 @Module({
-  imports: [AuthModule,MenuModule,AdsModule,CustomerFlowModule,SearchModule,OrderModule,CustomerModule,
+  imports: [AuthModule,MenuModule,AdsModule,CustomerFlowModule,SearchModule,OrderModule,CustomerModule,ChatModule,
     AddressModule,
     ScheduleModule.forRoot(),CronjobServiceModule,
     //For bearer token authentication
@@ -25,12 +27,13 @@ import { CustomerModule } from './features/user/customer/customer.module';
     ttl: 60000,
     limit: 30,
   }]), 
+  
 ],
   controllers: [],
   providers: [FirebaseServices,{
     provide: APP_GUARD,
     useClass: ThrottlerGuard
-  }
+  },BaseGateway
   ],
 })
 export class AppModule {}
