@@ -16,4 +16,15 @@ async getNewAdvertisement(@Body() params:BoostRestaurantOrMenuDto):Promise<HttpE
     throw Error();
     }
 }
+
+@UseGuards(AuthGuard)
+@Get('get-restaurant-ads')
+async getRestaurantAds(@Query("restaurantId") restaurantId:string):Promise<BoostRestaurantOrMenuDto[]>{
+try {
+return await this.service.getRestaurantAds(restaurantId);
+}
+catch (error) {
+throw Error(error);
+}
+}
 }

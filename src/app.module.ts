@@ -15,10 +15,11 @@ import { OrderModule } from './features/order/order.module';
 import { CustomerModule } from './features/user/customer/customer.module';
 import { ChatModule } from './features/chat/chat.module';
 import { BaseGateway } from './core/base/base.gateway';
+import { RestaurantModule } from './features/user/restraurant/restaurant.module';
 
 @Module({
   imports: [AuthModule,MenuModule,AdsModule,CustomerFlowModule,SearchModule,OrderModule,CustomerModule,ChatModule,
-    AddressModule,
+    AddressModule,RestaurantModule,
     ScheduleModule.forRoot(),CronjobServiceModule,
     //For bearer token authentication
     new JwtConstants().jwtModule,

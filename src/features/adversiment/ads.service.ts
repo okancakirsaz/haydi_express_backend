@@ -53,13 +53,25 @@ export class AdsService extends BaseService{
     private async  checkIsRestaurantExist(restaurantId:string):Promise<boolean>{
         const boostedRestaurants = await this.firebase.getDataWithWhereQuery(FirebaseColumns.BOOSTED_RESTAURANTS,"restaurantId","==",restaurantId)??[];
         const boostedMenus = await this.firebase.getDataWithWhereQuery(FirebaseColumns.BOOSTED_MENUS,"restaurantId","==",restaurantId)??[];
-
-        if(boostedRestaurants.length>=1||boostedMenus.length>=1){
+        let isMenuBoostIsSuggestions = false;
+        for(let i:number = 0;i<=boostedMenus.length-1;i++){
+            if(BoostRestaurantOrMenuDto.fromJson(boostedMenus[i]).boostArea=="Arama Önerileri"){
+                isMenuBoostIsSuggestions=true;
+            }
+        }
+        if(boostedRestaurants.length>=1||isMenuBoostIsSuggestions){
         return true;
         }
         else{
         return false;
         }
+    }
+
+     async  getRestaurantAds(restaurantId:string):Promise<BoostRestaurantOrMenuDto[]>{
+        const boostedRestaurants = await this.firebase.getDataWithWhereQuery(FirebaseColumns.BOOSTED_RESTAURANTS,"restaurantId","==",restaurantId)??[];
+        const boostedMenus = await this.firebase.getDataWithWhereQuery(FirebaseColumns.BOOSTED_MENUS,"restaurantId","==",restaurantId)??[];
+        const addicted:BoostRestaurantOrMenuDto[] = boostedMenus.concat(boostedRestaurants).map((e)=>BoostRestaurantOrMenuDto.fromJson(e));
+        return addicted;
     }
 
 }

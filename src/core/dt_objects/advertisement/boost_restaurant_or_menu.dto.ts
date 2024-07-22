@@ -3,6 +3,7 @@ export class BoostRestaurantOrMenuDto{
     elementId:string;
     isRestaurant:boolean;
     restaurantId:string;
+    menuName?:string;
     boostArea:string;
 
     static toJson(data: BoostRestaurantOrMenuDto): any {
@@ -11,6 +12,7 @@ export class BoostRestaurantOrMenuDto{
           "elementId":data.elementId,
           "isRestaurant":data.isRestaurant,
           "restaurantId":data.restaurantId,
+          "menuName":data.menuName,
           "boostArea":data.boostArea,
         };
       }
@@ -21,6 +23,7 @@ export class BoostRestaurantOrMenuDto{
         object.elementId=data["elementId"];
         object.isRestaurant = data["isRestaurant"];
         object.restaurantId = data["restaurantId"];
+        object.menuName = data["menuName"];
         object.boostArea = data["boostArea"];
         return object;
       }

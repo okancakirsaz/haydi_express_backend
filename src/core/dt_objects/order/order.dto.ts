@@ -14,6 +14,7 @@ export class OrderDto{
     customerName:string;
     customerId:string;
     restaurantId:string;
+    restaurantName:string;
     customerPhoneNumber:string;
     note:string;
     isPaidSuccess?:boolean;
@@ -32,6 +33,7 @@ export class OrderDto{
           "customerName": data.customerName,
           "customerId": data.customerId,
           "restaurantId": data.restaurantId,
+          "restaurantName": data.restaurantName,
           "customerPhoneNumber":data.customerPhoneNumber,
           "note":data.note,
           "isPaidSuccess":data.isPaidSuccess,
@@ -51,6 +53,7 @@ export class OrderDto{
         object.customerName = data['customerName'];
         object.customerId = data['customerId'];
         object.restaurantId = data['restaurantId'];
+        object.restaurantName = data['restaurantName'];
         object.customerPhoneNumber=data["customerPhoneNumber"];
         object.note = data["note"];
         object.isPaidSuccess=data['isPaidSuccess'];
