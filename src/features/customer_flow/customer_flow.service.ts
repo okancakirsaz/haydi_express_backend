@@ -26,8 +26,10 @@ private async fetchMenuFromBoosts(queryAsDto:BoostRestaurantOrMenuDto[]){
     for(let i = 0;i<=queryAsDto.length-1;i++){
         const query:any = await this.firebase.getDataWithWhereQuery(FirebaseColumns.RESTAURANT_MENUS,
             "menuId","==", queryAsDto[i].elementId,
-        ); 
+        )??[]; 
+       if(query.length!=0){
         menuQuery.push(query[0]);
+       }
     }
     let menuQueryAsDto:MenuDto[] = [];
     if(menuQuery.length!=0){

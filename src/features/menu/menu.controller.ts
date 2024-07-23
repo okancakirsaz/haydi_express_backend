@@ -1,9 +1,10 @@
-import { Body, Controller, Get, Post, Query, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Get, HttpException, Post, Query, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { MenuService } from "./menu.service";
 import { MenuDto } from "src/core/dt_objects/menu/menu.dto";
 import { FileInterceptor } from "@nestjs/platform-express/multer";
 import { DiscountDto } from "src/core/dt_objects/menu/discount.dto";
 import { AuthGuard } from "src/core/guard/auth.guard";
+import { CommentDto } from "src/core/dt_objects/public/comment.dto";
 
 @Controller('menu')
 export class MenuController{
@@ -78,6 +79,26 @@ export class MenuController{
         try {
            
             return await this.service.getSimilarFoods(JSON.parse(tags),menuId);
+        } catch (error) {
+            throw Error(error);
+        }
+    }
+
+    @UseGuards(AuthGuard)
+    @Post('new-comment')
+    async newComment(@Body() params:CommentDto):Promise<boolean|HttpException>{
+        try {
+            return await this.service.newComment(params);
+        } catch (error) {
+            throw Error(error);
+        }
+    }
+
+    @UseGuards(AuthGuard)
+    @Get('is-menu-available')
+    async isMenuAvailable(@Query("menuId") menuId:string):Promise<boolean>{
+        try {
+            return await this.service.isMenuAvailable(menuId);
         } catch (error) {
             throw Error(error);
         }

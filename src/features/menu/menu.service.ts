@@ -1,8 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { BaseService } from 'src/core/base/base_service';
 import { FirebaseColumns } from 'src/core/constants/firebase_columns';
 import { DiscountDto } from 'src/core/dt_objects/menu/discount.dto';
 import { MenuDto } from 'src/core/dt_objects/menu/menu.dto';
+import { CommentDto } from 'src/core/dt_objects/public/comment.dto';
+import { params } from 'firebase-functions/v1';
 
 @Injectable()
 export class MenuService extends BaseService {
@@ -111,25 +113,101 @@ export class MenuService extends BaseService {
     }
   }
 
-
-
-  async getSimilarFoods(tags: string[],menuId:string): Promise<MenuDto[]> {
+  async getSimilarFoods(tags: string[], menuId: string): Promise<MenuDto[]> {
     let finalRawData = [];
-    for (let i:number = 0; i <= tags.length - 1; i++) {
+    for (let i: number = 0; i <= tags.length - 1; i++) {
       const response: Record<string, any>[] =
-        await this.firebase.getDataWithWhereQueryLimited(
+        (await this.firebase.getDataWithWhereQueryLimited(
           FirebaseColumns.RESTAURANT_MENUS,
           'tags',
           'array-contains',
           tags[i],
           2,
-        )??[];  
-      for(let j:number = 0;j<=response.length-1;j++){
-        if(response[j]!=null&&response[j]["menuId"]!=menuId){
+        )) ?? [];
+      for (let j: number = 0; j <= response.length - 1; j++) {
+        if (response[j] != null && response[j]['menuId'] != menuId) {
           finalRawData.push(response[j]);
         }
       }
     }
-    return finalRawData.map((e)=>MenuDto.fromJson(e));
+    return finalRawData.map((e) => MenuDto.fromJson(e));
   }
+
+  async newComment(params:CommentDto): Promise<boolean | HttpException> {
+    try {
+      const checkIsUserCommittedThisMenuBefore: boolean =
+        await this.checkIsUserCommittedThisMenuBefore(params);
+      if (checkIsUserCommittedThisMenuBefore) {
+        return new HttpException(
+          'Bu menü için daha önce yorum yapmışsınız.',
+          HttpStatus.CONFLICT,
+        );
+      }
+      await this.firebase.setData(FirebaseColumns.COMMENTS,params.uid,CommentDto.toJson(params));
+      await this.updateMenuData(params);
+      return true;
+    } catch (error) {  
+      return new HttpException(
+        'Bir sorun oluştu, tekrar deneyiniz.',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  private async updateMenuData(params: CommentDto) {
+        const column:string = FirebaseColumns.RESTAURANT_MENUS;
+        const rawData= 
+          await this.firebase.getDoc(column, params.menuId);
+        //Doing null check because menu may be was deleted.
+        if(rawData!=null){
+        let menu:MenuDto = MenuDto.fromJson(rawData);
+        menu.stats.comments.push(params);
+        //like parameter come between 1-5
+        menu.stats.likeRatio= this.calculateMenuPoint(menu,params.like)
+        await this.firebase.updateData(
+          column,
+          params.menuId,
+          MenuDto.toJson(menu),
+        );
+        }
+  }
+
+  private calculateMenuPoint(menu:MenuDto,like: number):number {
+    const likeList:number[] = menu.stats.comments.map((e)=>e.like*20);
+    likeList.push(like*20);
+    const likeRatio:number = likeList.reduce((a,b)=>a+b);
+    console.log(likeRatio);
+    return likeRatio/likeList.length;
+  }
+
+  private async checkIsUserCommittedThisMenuBefore(
+    params: CommentDto,
+  ): Promise<boolean> {
+    const check: any[] = await this.firebase.getDataWithWhereQuery(
+      FirebaseColumns.COMMENTS,
+      'customerId',
+      '==',
+      params.customerId,
+    )??[];
+    let checkIsUserCommittedThisMenuBefore: boolean = false;
+    for (let i: number = 0; i <= check.length - 1; i++) {
+      const element: CommentDto = CommentDto.fromJson(check[i]);
+      if (element.menuId == params.menuId) {
+        checkIsUserCommittedThisMenuBefore = true;
+      }
+    }
+    return checkIsUserCommittedThisMenuBefore;
+  }
+
+ async isMenuAvailable(menuId:string):Promise<boolean>{
+    const column:string = FirebaseColumns.RESTAURANT_MENUS;
+    const rawData= 
+      await this.firebase.getDoc(column,menuId);
+    if(rawData!=null){
+      return true;
+    }
+    else{
+      return false;
+    }
+}
 }
