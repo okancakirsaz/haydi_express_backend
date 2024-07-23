@@ -103,4 +103,14 @@ export class MenuController{
             throw Error(error);
         }
     }
+
+    @UseGuards(AuthGuard)
+    @Get('get-menu')
+    async getMenu(@Query("menuId") menuId:string):Promise<MenuDto>{
+    try {
+        return await this.service.getMenu(menuId);
+    } catch (error) {
+        throw Error(error);
+    }
+}
 }

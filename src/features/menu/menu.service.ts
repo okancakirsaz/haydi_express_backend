@@ -210,4 +210,10 @@ export class MenuService extends BaseService {
       return false;
     }
 }
+
+
+async getMenu(menuId:string):Promise<MenuDto>{
+  const menu = await this.firebase.getDoc(FirebaseColumns.RESTAURANT_MENUS,menuId);
+  return MenuDto.fromJson(menu);
+}
 }
