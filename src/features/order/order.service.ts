@@ -61,7 +61,6 @@ export class OrderService extends BaseService {
 
   newOrderStream(params: OrderDto) {
     //TODO: Add operation panel part
-
     this.gateway.newRestaurantOrder(params, params.restaurantId);
   }
 
