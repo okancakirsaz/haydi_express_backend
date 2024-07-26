@@ -8,6 +8,9 @@ import { PaymentDto } from 'src/core/dt_objects/order/payment.dto';
 import { OrderGateway } from './order.gateway';
 import { params } from 'firebase-functions/v1';
 import { CancelOrderDto } from 'src/core/dt_objects/order/cancel_order.dto';
+import { MenuDto } from '../../core/dt_objects/menu/menu.dto';
+import { RestaurantService } from '../user/restraurant/restaurant.service';
+import { DistanceCalculator } from 'src/core/services/distance_calculator';
 
 @Injectable()
 export class OrderService extends BaseService {
@@ -15,8 +18,8 @@ export class OrderService extends BaseService {
     super();
   }
 
-  private readonly cancelledOrderState:string = "İptal Edildi";
-  private readonly deliveredOrderState:string = "Teslim Edildi";
+  private readonly cancelledOrderState: string = 'İptal Edildi';
+  private readonly deliveredOrderState: string = 'Teslim Edildi';
 
   async isRestaurantsUsesHe(ids: string[]): Promise<boolean[]> {
     let finalValue: boolean[] = [];
@@ -39,6 +42,7 @@ export class OrderService extends BaseService {
   async createOrder(params: OrderDto): Promise<boolean | HttpException> {
     try {
       const column: string = FirebaseColumns.ORDERS;
+      params.distance = await this.calculateDistance(params);
       await this.firebase.setData(
         column,
         params.orderId,
@@ -48,6 +52,9 @@ export class OrderService extends BaseService {
         return await this.onlinePaymentProcess(params);
       } else {
         this.newOrderStream(params);
+        await this.updateMenusTotalOrderData(
+          params.menuData.map((e) => e.menuElement),
+        );
         return true;
       }
     } catch (error) {
@@ -55,6 +62,32 @@ export class OrderService extends BaseService {
       return new HttpException(
         'Bilinmeyen bir hata oluştu.',
         HttpStatus.BAD_GATEWAY,
+      );
+    }
+  }
+
+  private async calculateDistance(params: OrderDto): Promise<number | null> {
+    const restaurant: RestaurantDto =
+      await new RestaurantService().getRestaurant(params.restaurantId);
+    if (
+      (restaurant.address.lat != null && restaurant.address.long != null) ||
+      (params.addressData.lat != null && params.addressData.long != null)
+    ) {
+      const calculator = new DistanceCalculator(
+        { lat: restaurant.address.lat, long: restaurant.address.long },
+        { lat: params.addressData.lat, long: params.addressData.long },
+      );
+      return calculator.calculate();
+    }
+  }
+
+  async updateMenusTotalOrderData(menus: MenuDto[]) {
+    for (let i: number = 0; i < menus.length; i++) {
+      menus[i].stats.totalOrderCount += 1;
+      await this.firebase.updateData(
+        FirebaseColumns.RESTAURANT_MENUS,
+        menus[i].menuId,
+        menus[i],
       );
     }
   }
@@ -96,7 +129,7 @@ export class OrderService extends BaseService {
     }
   }
 
-  async restaurantActiveOrders(restaurantId:string): Promise<OrderDto[]> {
+  async restaurantActiveOrders(restaurantId: string): Promise<OrderDto[]> {
     const dbQuery: any[] =
       (await this.firebase.getDataWithWhereQuery(
         FirebaseColumns.ORDERS,
@@ -119,7 +152,7 @@ export class OrderService extends BaseService {
     }
   }
 
-  async customerActiveOrders(customerId:string): Promise<OrderDto[]> {
+  async customerActiveOrders(customerId: string): Promise<OrderDto[]> {
     const dbQuery: any[] =
       (await this.firebase.getDataWithWhereQuery(
         FirebaseColumns.ORDERS,
@@ -148,12 +181,7 @@ export class OrderService extends BaseService {
         params.orderState == this.deliveredOrderState ||
         params.orderState == this.cancelledOrderState
       ) {
-        const logProcess = await this.takeLogExpiredOrder(params);
-        this.gateway.orderUpdate(params, params.orderId);
-        if (logProcess == true) {
-          await this.firebase.deleteDoc(FirebaseColumns.ORDERS, params.orderId);
-        }
-        return logProcess;
+        return await this.orderDeliveryOrCancelledProcess(params);
       } else {
         await this.firebase.updateData(
           FirebaseColumns.ORDERS,
@@ -168,6 +196,26 @@ export class OrderService extends BaseService {
         'Bir sorun oluştu, tekrar deneyiniz.',
         HttpStatus.BAD_REQUEST,
       );
+    }
+  }
+
+  private async orderDeliveryOrCancelledProcess(
+    params: OrderDto,
+  ): Promise<boolean | HttpException> {
+    params.deliveryDate = this.isDeliveredSetDeliveryDate(params.orderState);
+    const logProcess = await this.takeLogExpiredOrder(params);
+    this.gateway.orderUpdate(params, params.orderId);
+    if (logProcess == true) {
+      await this.firebase.deleteDoc(FirebaseColumns.ORDERS, params.orderId);
+    }
+    return logProcess;
+  }
+
+  private isDeliveredSetDeliveryDate(orderState: string): string | null {
+    if (orderState == this.deliveredOrderState) {
+      return new Date().toISOString();
+    } else {
+      return null;
     }
   }
 
@@ -188,36 +236,46 @@ export class OrderService extends BaseService {
     }
   }
 
-  async getOrderLogs(restaurantId: string,dateRange:string[]): Promise<OrderDto[]> {
-   
-      const response: any[] =
+  async getOrderLogs(
+    restaurantId: string,
+    dateRange: string[],
+  ): Promise<OrderDto[]> {
+    const response: any[] =
       (
         await this.logDatabase.db
-          .collection(FirebaseColumns.ORDERS).where("restaurantId","==",restaurantId)
-          .where("orderCreationDate",">=",dateRange[0]).where("orderCreationDate","<=",dateRange[1])
+          .collection(FirebaseColumns.ORDERS)
+          .where('restaurantId', '==', restaurantId)
+          .where('orderCreationDate', '>=', dateRange[0])
+          .where('orderCreationDate', '<=', dateRange[1])
           .get()
       ).docs ?? [];
-      return response.map((e) => OrderDto.fromJson(e.data()));
+    return response.map((e) => OrderDto.fromJson(e.data()));
   }
 
-  async getOrderLogsForCustomer(customerId:string): Promise<OrderDto[]> {
-   
+  async getOrderLogsForCustomer(customerId: string): Promise<OrderDto[]> {
     const response: any[] =
-    (
-      await this.logDatabase.db
-        .collection(FirebaseColumns.ORDERS).where("customerId","==",customerId)
-        .get()
-    ).docs ?? [];
+      (
+        await this.logDatabase.db
+          .collection(FirebaseColumns.ORDERS)
+          .where('customerId', '==', customerId)
+          .get()
+      ).docs ?? [];
     return response.map((e) => OrderDto.fromJson(e.data()));
-}
+  }
 
-  async cancelOrder(params:CancelOrderDto):Promise<boolean | HttpException>{
+  //isCancelledFromCourier data came with params
+  async cancelOrder(params: CancelOrderDto): Promise<boolean | HttpException> {
     try {
       //TODO: Integrate cashback
-      params.order.orderState=this.cancelledOrderState;
-      const updateProcessSuccess:boolean|HttpException = await this.updateOrderState(params.order);
-      if(updateProcessSuccess==true){
-        await this.firebase.setData(FirebaseColumns.CANCELLED_ORDERS,params.order.orderId,CancelOrderDto.toJson(params));
+      params.order.orderState = this.cancelledOrderState;
+      const updateProcessSuccess: boolean | HttpException =
+        await this.updateOrderState(params.order);
+      if (updateProcessSuccess == true) {
+        await this.firebase.setData(
+          FirebaseColumns.CANCELLED_ORDERS,
+          params.order.orderId,
+          CancelOrderDto.toJson(params),
+        );
       }
       return updateProcessSuccess;
     } catch (error) {

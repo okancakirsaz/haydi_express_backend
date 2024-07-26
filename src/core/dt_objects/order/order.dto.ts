@@ -14,7 +14,10 @@ export class OrderDto{
     customerName:string;
     customerId:string;
     restaurantId:string;
+    isCancelledFromCourier?:boolean;
     restaurantName:string;
+    deliveryDate?:string;
+    distance?:number;
     customerPhoneNumber:string;
     note:string;
     isPaidSuccess?:boolean;
@@ -31,6 +34,9 @@ export class OrderDto{
           "orderState": data.orderState,
           "orderCreationDate":data.orderCreationDate,
           "customerName": data.customerName,
+          "deliveryDate":data.deliveryDate,
+          "distance":data.distance,
+          "isCancelledFromCourier":data.isCancelledFromCourier,
           "customerId": data.customerId,
           "restaurantId": data.restaurantId,
           "restaurantName": data.restaurantName,
@@ -56,8 +62,11 @@ export class OrderDto{
         object.restaurantName = data['restaurantName'];
         object.customerPhoneNumber=data["customerPhoneNumber"];
         object.note = data["note"];
+        object.distance = data["distance"];
+        object.deliveryDate=data['deliveryDate'];
         object.isPaidSuccess=data['isPaidSuccess'];
         object.courierId=data['courierId'];
+        object.isCancelledFromCourier = data['isCancelledFromCourier'];
         return object;
       }
 }

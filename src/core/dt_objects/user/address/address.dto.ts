@@ -11,6 +11,7 @@ export class AddressDto{
     lat?:number;
     long?:number;
     isVerifiedFromCourier:boolean
+    verifierCourierId?:string
     courierAddressDirection?:string;
     uid:string;
     addressOwner:string
@@ -30,6 +31,7 @@ export class AddressDto{
           "lat": data.lat,
           "long":data.long,
           "isVerifiedFromCourier":data.isVerifiedFromCourier,
+          "verifierCourierId":data.verifierCourierId,
           "uid":data.uid,
           "courierAddressDirection":data.courierAddressDirection,
           "addressOwner":data.addressOwner,
@@ -51,6 +53,7 @@ export class AddressDto{
         object.long=data["long"];
         object.isVerifiedFromCourier = data["isVerifiedFromCourier"];
         object.uid = data['uid'];
+        object.verifierCourierId=data['verifierCourierId'];
         object.courierAddressDirection=data['courierAddressDirection'];
         object.addressOwner=data['addressOwner'];
         return object;

@@ -1,3 +1,5 @@
+import { AddressDto } from "./address/address.dto"
+
 export class RestaurantDto {
   ownerName:string
   ownerSurname:string
@@ -7,7 +9,7 @@ export class RestaurantDto {
   password:string
   taxNumber:string
   isMailVerified:boolean
-  address:string
+  address:AddressDto
   wantDeliveryFromUs:boolean
   ibanNumber:string
   bankName:string
@@ -32,7 +34,7 @@ export class RestaurantDto {
         "password":data.password,
         "taxNumber":data.taxNumber,
         "isMailVerified":data.isMailVerified,
-        "address":data.address,
+        "address":AddressDto.toJson(data.address),
         "wantDeliveryFromUs":data.wantDeliveryFromUs,
         "ibanNumber":data.ibanNumber,
         "bankName":data.bankName,
@@ -60,7 +62,7 @@ export class RestaurantDto {
     object.password=data["password"];
     object.taxNumber=data["taxNumber"];
     object.isMailVerified=data["isMailVerified"];
-    object.address=data["address"];
+    object.address=AddressDto.fromJson(data["address"]);
     object.wantDeliveryFromUs=data["wantDeliveryFromUs"];
     object.ibanNumber=data["ibanNumber"];
     object.bankName=data["bankName"];
