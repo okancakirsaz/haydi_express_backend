@@ -1,3 +1,5 @@
+import { CardDto } from "../order/card.dto"
+import { WorkHoursDto } from "../public/work_hours.dto"
 import { AddressDto } from "./address/address.dto"
 
 export class RestaurantDto {
@@ -14,10 +16,8 @@ export class RestaurantDto {
   ibanNumber:string
   bankName:string
   bankAccountOwner:string
-  cardNumber:string
-  cardOwner:string
-  cardCvv:string
-  cardExpirationDate:string
+  workHours:WorkHoursDto;
+  payment:CardDto;
   isPoliciesAccepted:boolean
   accountCreationDate:string
   uid:string
@@ -39,10 +39,8 @@ export class RestaurantDto {
         "ibanNumber":data.ibanNumber,
         "bankName":data.bankName,
         "bankAccountOwner":data.bankAccountOwner,
-        "cardNumber":data.cardNumber,
-        "cardOwner":data.cardOwner,
-        "cardCvv":data.cardCvv,
-        "cardExpirationDate":data.cardExpirationDate,
+        "workHours":WorkHoursDto.toJson(data.workHours),
+        "payment":CardDto.toJson(data.payment),
         "isPoliciesAccepted":data.isPoliciesAccepted,
         "accountCreationDate":data.accountCreationDate,
         "uid":data.uid,
@@ -67,10 +65,8 @@ export class RestaurantDto {
     object.ibanNumber=data["ibanNumber"];
     object.bankName=data["bankName"];
     object.bankAccountOwner=data["bankAccountOwner"];
-    object.cardNumber=data["cardNumber"];
-    object.cardOwner=data["cardOwner"];
-    object.cardCvv=data["cardCvv"];
-    object.cardExpirationDate=data["cardExpirationDate"];
+    object.workHours=WorkHoursDto.fromJson(data["workHours"]);
+    object.payment=CardDto.fromJson(data["payment"]);
     object.isPoliciesAccepted=data["isPoliciesAccepted"];
     object.accountCreationDate=data["accountCreationDate"];
     object.uid=data["uid"];

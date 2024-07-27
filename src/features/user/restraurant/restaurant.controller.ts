@@ -3,6 +3,7 @@ import { RestaurantService } from './restaurant.service';
 import { AuthGuard } from 'src/core/guard/auth.guard';
 import { RestaurantDto } from 'src/core/dt_objects/user/restaurant.dto';
 import { CommentDto } from 'src/core/dt_objects/public/comment.dto';
+import { WorkHoursDto } from 'src/core/dt_objects/public/work_hours.dto';
 
 @Controller('restaurant')
 export class RestaurantController{
@@ -14,6 +15,16 @@ constructor(private readonly service:RestaurantService){
 async getRestaurant(@Query("restaurantId") restaurantId:string):Promise<RestaurantDto>{
     try {
         return await this.service.getRestaurant(restaurantId);
+    } catch (error) {
+        throw Error(error);
+    }
+}
+
+@UseGuards(AuthGuard)
+@Get('get-restaurant-work-hours')
+async getRestaurantWorkHours(@Query("restaurantId") restaurantId:string):Promise<WorkHoursDto>{
+    try {
+        return await this.service.getRestaurantWorkHours(restaurantId);
     } catch (error) {
         throw Error(error);
     }
