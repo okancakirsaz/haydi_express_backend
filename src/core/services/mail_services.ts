@@ -38,9 +38,6 @@ export class MailServices{
 
     async sendVerificationCode(mailAddress:string,activationCode:string):Promise<boolean>{
         try {
-
-            
-            
             const mailOptions = {
                 from: this.mailHostAddress, 
                 to: mailAddress, 
@@ -48,7 +45,24 @@ export class MailServices{
                 //TODO:Change url after release website
                 text: activationCode
             };
+            
+            const info = await this.transporter.sendMail(mailOptions);
     
+            return true;
+        } catch (error) {
+            return false;
+        }
+    }
+
+    async sendPaymentErrorMail(message:string):Promise<boolean>{
+        try {
+            const mailOptions = {
+                from: this.mailHostAddress, 
+                //"muhasebe@haydiekspres.com.tr"
+                to:"okancakirsaz@haydiekspres.com.tr", 
+                subject: 'Ödeme Hatası',
+                text: message,
+            };
             
             const info = await this.transporter.sendMail(mailOptions);
     

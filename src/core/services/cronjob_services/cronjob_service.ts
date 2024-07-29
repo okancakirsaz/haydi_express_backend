@@ -6,6 +6,7 @@ import { BaseService } from "src/core/base/base_service";
 import { MenuDto } from "src/core/dt_objects/menu/menu.dto";
 import { BoostRestaurantOrMenuDto } from "src/core/dt_objects/advertisement/boost_restaurant_or_menu.dto";
 import { CancelOrderDto } from "src/core/dt_objects/order/cancel_order.dto";
+import { RestaurantService } from "src/features/user/restraurant/restaurant.service";
 
 
 @Injectable()
@@ -17,6 +18,7 @@ export class CronjobService extends BaseService{
     await this.checkMenuBoostIsExpired();
     await this.checkRestaurantBoostIsExpired();
     await this.clearCancelledOrders();
+    await new RestaurantService().restaurantBillings();
   }
   
   private async checkMenuCampaignsIsExpired() {
