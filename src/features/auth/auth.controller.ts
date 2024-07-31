@@ -11,11 +11,13 @@ import { CustomerDto } from "src/core/dt_objects/user/customer.dto";
 import { FirebaseColumns } from "src/core/constants/firebase_columns";
 import { CustomerAuthService } from "./service/customer_auth.service";
 import { RestaurantAuthService } from "./service/restaurant_auth.service";
+import { HubAuthService } from "./service/hub_auth.service";
+import { CodeLogInDto } from "src/core/dt_objects/auth/code_log_in.dto";
 
 
 @Controller('auth')
 export class AuthController{
-    constructor(private readonly service:AuthService,private readonly customerService:CustomerAuthService,private readonly restaurantService:RestaurantAuthService){}
+    constructor(private readonly service:AuthService,private readonly customerService:CustomerAuthService,private readonly restaurantService:RestaurantAuthService, private readonly hubService:HubAuthService){}
 
     @Post('sign-up-restaurant')
     async signUpAsRestaurant(@Body() params:RestaurantDto):Promise<RestaurantDto|HttpException>{
@@ -38,6 +40,15 @@ export class AuthController{
     async logInAsCustomer(@Body() params:LogInDto){
         try {
             return await this.service.logIn(params,FirebaseColumns.CUSTOMERS);
+        } catch (error) {
+            throw Error(error)
+        }
+    }
+
+    @Post("log-in-hub")
+    async logInHub(@Body() params:CodeLogInDto):Promise<CodeLogInDto|HttpException>{
+        try {
+            return await this.hubService.logInWithCode(params);
         } catch (error) {
             throw Error(error)
         }

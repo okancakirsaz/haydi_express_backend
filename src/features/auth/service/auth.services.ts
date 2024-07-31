@@ -16,10 +16,10 @@ import { JwtService } from "@nestjs/jwt";
 @Injectable()
 export class AuthService extends BaseService {
 
-    constructor(private readonly jwtService:JwtService) {
+    constructor(readonly jwtService:JwtService) {
       super();
     }
-    private mailService:MailServices = new MailServices();
+    readonly mailService:MailServices = new MailServices();
 
     
 

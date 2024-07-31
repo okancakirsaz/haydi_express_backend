@@ -30,7 +30,7 @@ async createOrder(@Body() params:OrderDto):Promise<boolean|HttpException>{
 @Get("restaurant-active-orders")
 async restaurantActiveOrders(@Query("restaurantId") restaurantId:string):Promise<OrderDto[]>{
     try {
-      return this.service.restaurantActiveOrders(restaurantId);  
+      return await this.service.restaurantActiveOrders(restaurantId);  
     } catch (error) {
       throw Error();
     }
@@ -40,7 +40,17 @@ async restaurantActiveOrders(@Query("restaurantId") restaurantId:string):Promise
 @Get("customer-active-orders")
 async customerActiveOrders(@Query("customerId") customerId:string):Promise<OrderDto[]>{
     try {
-      return this.service.customerActiveOrders(customerId);  
+      return await this.service.customerActiveOrders(customerId);  
+    } catch (error) {
+      throw Error();
+    }
+}
+
+@UseGuards(AuthGuard)
+@Get("hub-active-orders")
+async hubActiveOrders():Promise<OrderDto[]>{
+    try {
+      return await this.service.hubActiveOrders();  
     } catch (error) {
       throw Error();
     }

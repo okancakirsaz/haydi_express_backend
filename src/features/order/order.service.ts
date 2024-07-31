@@ -20,6 +20,7 @@ export class OrderService extends BaseService {
 
   private readonly cancelledOrderState: string = 'İptal Edildi';
   private readonly deliveredOrderState: string = 'Teslim Edildi';
+  private readonly restaurantService:RestaurantService = new RestaurantService();
 
   async isRestaurantsUsesHe(ids: string[]): Promise<boolean[]> {
     let finalValue: boolean[] = [];
@@ -43,20 +44,23 @@ export class OrderService extends BaseService {
     try {
       const column: string = FirebaseColumns.ORDERS;
       params.distance = await this.calculateDistance(params);
+      
+      if (params.paymentMethod == PaymentMethods.online) {
+        const onlinePayment:boolean|HttpException = await this.onlinePaymentProcess(params);
+        if(onlinePayment != true){
+          return onlinePayment;
+        }
+      } 
       await this.firebase.setData(
         column,
         params.orderId,
         OrderDto.toJson(params),
       );
-      if (params.paymentMethod == PaymentMethods.online) {
-        return await this.onlinePaymentProcess(params);
-      } else {
-        this.newOrderStream(params);
+        await this.newOrderStream(params);
         await this.updateMenusTotalOrderData(
           params.menuData.map((e) => e.menuElement),
         );
         return true;
-      }
     } catch (error) {
       console.log(error);
       return new HttpException(
@@ -68,7 +72,7 @@ export class OrderService extends BaseService {
 
   private async calculateDistance(params: OrderDto): Promise<number | null> {
     const restaurant: RestaurantDto =
-      await new RestaurantService().getRestaurant(params.restaurantId);
+      await this.restaurantService.getRestaurant(params.restaurantId);
     if (
       (restaurant.address.lat != null && restaurant.address.long != null) ||
       (params.addressData.lat != null && params.addressData.long != null)
@@ -92,8 +96,11 @@ export class OrderService extends BaseService {
     }
   }
 
-  newOrderStream(params: OrderDto) {
-    //TODO: Add operation panel part
+  async newOrderStream(params: OrderDto) {
+    const restaurantUsesCourierService:boolean = (await this.restaurantService.getRestaurant(params.restaurantId)).wantDeliveryFromUs;
+    if(restaurantUsesCourierService){
+    this.gateway.newHubOrder(params)
+    }
     this.gateway.newRestaurantOrder(params, params.restaurantId);
   }
 
@@ -110,21 +117,13 @@ export class OrderService extends BaseService {
   private async onlinePaymentProcess(
     params: OrderDto,
   ): Promise<boolean | HttpException> {
-    const column: string = FirebaseColumns.ORDERS;
     const isPaidSuccess: boolean | HttpException = await this.getPaid(
       params.paymentData,
     );
     if (isPaidSuccess == true) {
       params.isPaidSuccess = isPaidSuccess as boolean;
-      await this.firebase.updateData(
-        column,
-        params.orderId,
-        OrderDto.toJson(params),
-      );
-      this.newOrderStream(params);
       return true;
     } else {
-      await this.firebase.deleteDoc(FirebaseColumns.ORDERS, params.orderId);
       return isPaidSuccess as HttpException;
     }
   }
@@ -199,6 +198,30 @@ export class OrderService extends BaseService {
     }
   }
 
+
+  async hubActiveOrders():Promise<OrderDto[]>{
+    const dbQuery: any[] =
+    (await this.firebase.getDataWithWhereQuery(
+      FirebaseColumns.ORDERS,
+      'isDeliveringWithCourierService',
+      '==',
+      true,
+    )) ?? [];
+  if (dbQuery.length != 0) {
+    const transportedQuery: OrderDto[] = dbQuery.map((e) =>
+      OrderDto.fromJson(e),
+    );
+    const filteredQuery: OrderDto[] = transportedQuery.filter((e) => {
+      if (e.isPaidSuccess == null || e.isPaidSuccess) {
+        return e;
+      }
+    });
+    return filteredQuery;
+  } else {
+    return [];
+  }
+  }
+
   private async orderDeliveryOrCancelledProcess(
     params: OrderDto,
   ): Promise<boolean | HttpException> {
@@ -251,6 +274,7 @@ export class OrderService extends BaseService {
       ).docs ?? [];
     return response.map((e) => OrderDto.fromJson(e.data()));
   }
+  
 
   async getOrderLogsForCustomer(customerId: string): Promise<OrderDto[]> {
     const response: any[] =

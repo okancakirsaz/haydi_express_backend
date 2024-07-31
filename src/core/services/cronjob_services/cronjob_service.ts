@@ -7,6 +7,8 @@ import { MenuDto } from "src/core/dt_objects/menu/menu.dto";
 import { BoostRestaurantOrMenuDto } from "src/core/dt_objects/advertisement/boost_restaurant_or_menu.dto";
 import { CancelOrderDto } from "src/core/dt_objects/order/cancel_order.dto";
 import { RestaurantService } from "src/features/user/restraurant/restaurant.service";
+import { HubAuthService } from "src/features/auth/service/hub_auth.service";
+import { JwtService } from "@nestjs/jwt";
 
 
 @Injectable()
@@ -19,6 +21,7 @@ export class CronjobService extends BaseService{
     await this.checkRestaurantBoostIsExpired();
     await this.clearCancelledOrders();
     await new RestaurantService().restaurantBillings();
+    await new HubAuthService(null).createDailyCredentials();
   }
   
   private async checkMenuCampaignsIsExpired() {

@@ -71,4 +71,21 @@ export class MailServices{
             return false;
         }
     }
+
+    async sendHubAccessCode(code:string):Promise<boolean>{
+        try {
+            const mailOptions = {
+                from: this.mailHostAddress, 
+                to:"okancakirsaz@haydiekspres.com.tr", 
+                subject: 'Erişim Kodu',
+                text: code,
+            };
+            
+            const info = await this.transporter.sendMail(mailOptions);
+    
+            return true;
+        } catch (error) {
+            return false;
+        }
+    }
 }

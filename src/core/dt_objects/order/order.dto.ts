@@ -18,6 +18,7 @@ export class OrderDto{
     restaurantName:string;
     deliveryDate?:string;
     distance?:number;
+    isDeliveringWithCourierService:boolean
     customerPhoneNumber:string;
     note:string;
     isPaidSuccess?:boolean;
@@ -33,6 +34,7 @@ export class OrderDto{
           "paymentMethod":data.paymentMethod,
           "orderState": data.orderState,
           "orderCreationDate":data.orderCreationDate,
+          "isDeliveringWithCourierService":data.isDeliveringWithCourierService,
           "customerName": data.customerName,
           "deliveryDate":data.deliveryDate,
           "distance":data.distance,
@@ -56,6 +58,7 @@ export class OrderDto{
         object.paymentMethod=data["paymentMethod"];
         object.orderState = data['orderState'];
         object.orderCreationDate = data["orderCreationDate"];
+        object.isDeliveringWithCourierService = data["isDeliveringWithCourierService"];
         object.customerName = data['customerName'];
         object.customerId = data['customerId'];
         object.restaurantId = data['restaurantId'];
