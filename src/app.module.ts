@@ -16,10 +16,11 @@ import { CustomerModule } from './features/user/customer/customer.module';
 import { ChatModule } from './features/chat/chat.module';
 import { BaseGateway } from './core/base/base.gateway';
 import { RestaurantModule } from './features/user/restraurant/restaurant.module';
+import { CourierModule } from './features/user/courier/courier.module';
 
 @Module({
   imports: [AuthModule,MenuModule,AdsModule,CustomerFlowModule,SearchModule,OrderModule,CustomerModule,ChatModule,
-    AddressModule,RestaurantModule,
+    AddressModule,RestaurantModule,CourierModule,
     ScheduleModule.forRoot(),CronjobServiceModule,
     //For bearer token authentication
     new JwtConstants().jwtModule,

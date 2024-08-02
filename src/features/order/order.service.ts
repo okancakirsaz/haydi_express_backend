@@ -259,6 +259,7 @@ export class OrderService extends BaseService {
     }
   }
 
+   //TODO: Make SOLID compilable
   async getOrderLogs(
     restaurantId: string,
     dateRange: string[],
@@ -274,8 +275,24 @@ export class OrderService extends BaseService {
       ).docs ?? [];
     return response.map((e) => OrderDto.fromJson(e.data()));
   }
-  
 
+   //TODO: Make SOLID compilable
+  async getOrderLogsForHub(
+    dateRange: string[],
+  ): Promise<OrderDto[]> {
+    const response: any[] =
+      (
+        await this.logDatabase.db
+          .collection(FirebaseColumns.ORDERS)
+          .where('isDeliveringWithCourierService', '==', true)
+          .where('orderCreationDate', '>=', dateRange[0])
+          .where('orderCreationDate', '<=', dateRange[1])
+          .get()
+      ).docs ?? [];
+    return response.map((e) => OrderDto.fromJson(e.data()));
+  }
+  
+  //TODO: Make SOLID compilable
   async getOrderLogsForCustomer(customerId: string): Promise<OrderDto[]> {
     const response: any[] =
       (
@@ -286,6 +303,9 @@ export class OrderService extends BaseService {
       ).docs ?? [];
     return response.map((e) => OrderDto.fromJson(e.data()));
   }
+
+
+ 
 
   //isCancelledFromCourier data came with params
   async cancelOrder(params: CancelOrderDto): Promise<boolean | HttpException> {

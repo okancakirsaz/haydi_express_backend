@@ -77,6 +77,16 @@ async getOrderLogs(@Query("restaurantId") restaurantId:string,@Query("dateRange"
 }
 
 @UseGuards(AuthGuard)
+@Get("hub-order-logs")
+async getOrderLogsForHub(@Query("dateRange") dateRange:string):Promise<OrderDto[]>{
+    try {
+      return await this.service.getOrderLogsForHub(JSON.parse(dateRange));  
+    } catch (error) {
+      throw Error();
+    }
+}
+
+@UseGuards(AuthGuard)
 @Get("customer-order-logs")
 async getOrderLogsForCustomer(@Query("restaurantId") restaurantId:string):Promise<OrderDto[]>{
     try {
