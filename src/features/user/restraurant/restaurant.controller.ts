@@ -22,6 +22,16 @@ async getRestaurant(@Query("restaurantId") restaurantId:string):Promise<Restaura
 }
 
 @UseGuards(AuthGuard)
+@Get('get-restaurants-uses-courier-service')
+async getRestaurantsUsesCourierService():Promise<RestaurantDto[]>{
+    try {
+        return await this.service.getRestaurantsUsesCourierService();
+    } catch (error) {
+        throw Error(error);
+    }
+}
+
+@UseGuards(AuthGuard)
 @Get('get-restaurant-all-data')
 async getRestaurantAllData(@Query("restaurantId") restaurantId:string):Promise<RestaurantDto>{
     try {

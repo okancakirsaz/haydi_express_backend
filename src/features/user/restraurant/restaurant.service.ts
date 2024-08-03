@@ -27,6 +27,11 @@ export class RestaurantService extends BaseService{
         return asModel;
     }
 
+   async getRestaurantsUsesCourierService():Promise<RestaurantDto[]>{
+    const rawData = await this.firebase.getDataWithWhereQuery(FirebaseColumns.RESTAURANTS,"wantDeliveryFromUs","==",true)??[];
+    return rawData.map((e)=>RestaurantDto.fromJson(e));
+   }
+
     async getRestaurantAllData(restaurantId:string):Promise<RestaurantDto>{
         const restaurant = await this.firebase.getDoc(FirebaseColumns.RESTAURANTS,restaurantId);
         const asModel = RestaurantDto.fromJson(restaurant);
