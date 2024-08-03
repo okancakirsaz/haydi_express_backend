@@ -128,13 +128,13 @@ export class OrderService extends BaseService {
     }
   }
 
-  async restaurantActiveOrders(restaurantId: string): Promise<OrderDto[]> {
+  async activeOrders(key:string,value: any): Promise<OrderDto[]> {
     const dbQuery: any[] =
       (await this.firebase.getDataWithWhereQuery(
         FirebaseColumns.ORDERS,
-        'restaurantId',
+        key,
         '==',
-        restaurantId,
+        value,
       )) ?? [];
     if (dbQuery.length != 0) {
       const transportedQuery: OrderDto[] = dbQuery.map((e) =>
@@ -151,28 +151,6 @@ export class OrderService extends BaseService {
     }
   }
 
-  async customerActiveOrders(customerId: string): Promise<OrderDto[]> {
-    const dbQuery: any[] =
-      (await this.firebase.getDataWithWhereQuery(
-        FirebaseColumns.ORDERS,
-        'customerId',
-        '==',
-        customerId,
-      )) ?? [];
-    if (dbQuery.length != 0) {
-      const transportedQuery: OrderDto[] = dbQuery.map((e) =>
-        OrderDto.fromJson(e),
-      );
-      const filteredQuery: OrderDto[] = transportedQuery.filter((e) => {
-        if (e.isPaidSuccess == null || e.isPaidSuccess) {
-          return e;
-        }
-      });
-      return filteredQuery;
-    } else {
-      return [];
-    }
-  }
 
   async updateOrderState(params: OrderDto): Promise<boolean | HttpException> {
     try {
@@ -196,30 +174,6 @@ export class OrderService extends BaseService {
         HttpStatus.BAD_REQUEST,
       );
     }
-  }
-
-
-  async hubActiveOrders():Promise<OrderDto[]>{
-    const dbQuery: any[] =
-    (await this.firebase.getDataWithWhereQuery(
-      FirebaseColumns.ORDERS,
-      'isDeliveringWithCourierService',
-      '==',
-      true,
-    )) ?? [];
-  if (dbQuery.length != 0) {
-    const transportedQuery: OrderDto[] = dbQuery.map((e) =>
-      OrderDto.fromJson(e),
-    );
-    const filteredQuery: OrderDto[] = transportedQuery.filter((e) => {
-      if (e.isPaidSuccess == null || e.isPaidSuccess) {
-        return e;
-      }
-    });
-    return filteredQuery;
-  } else {
-    return [];
-  }
   }
 
   private async orderDeliveryOrCancelledProcess(
@@ -259,32 +213,16 @@ export class OrderService extends BaseService {
     }
   }
 
-   //TODO: Make SOLID compilable
   async getOrderLogs(
-    restaurantId: string,
+    key:string,
+    value: any,
     dateRange: string[],
   ): Promise<OrderDto[]> {
     const response: any[] =
       (
         await this.logDatabase.db
           .collection(FirebaseColumns.ORDERS)
-          .where('restaurantId', '==', restaurantId)
-          .where('orderCreationDate', '>=', dateRange[0])
-          .where('orderCreationDate', '<=', dateRange[1])
-          .get()
-      ).docs ?? [];
-    return response.map((e) => OrderDto.fromJson(e.data()));
-  }
-
-   //TODO: Make SOLID compilable
-  async getOrderLogsForHub(
-    dateRange: string[],
-  ): Promise<OrderDto[]> {
-    const response: any[] =
-      (
-        await this.logDatabase.db
-          .collection(FirebaseColumns.ORDERS)
-          .where('isDeliveringWithCourierService', '==', true)
+          .where(key, '==', value)
           .where('orderCreationDate', '>=', dateRange[0])
           .where('orderCreationDate', '<=', dateRange[1])
           .get()
@@ -292,7 +230,6 @@ export class OrderService extends BaseService {
     return response.map((e) => OrderDto.fromJson(e.data()));
   }
   
-  //TODO: Make SOLID compilable
   async getOrderLogsForCustomer(customerId: string): Promise<OrderDto[]> {
     const response: any[] =
       (

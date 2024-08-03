@@ -30,7 +30,7 @@ async createOrder(@Body() params:OrderDto):Promise<boolean|HttpException>{
 @Get("restaurant-active-orders")
 async restaurantActiveOrders(@Query("restaurantId") restaurantId:string):Promise<OrderDto[]>{
     try {
-      return await this.service.restaurantActiveOrders(restaurantId);  
+      return await this.service.activeOrders("restaurantId",restaurantId);  
     } catch (error) {
       throw Error();
     }
@@ -40,7 +40,7 @@ async restaurantActiveOrders(@Query("restaurantId") restaurantId:string):Promise
 @Get("customer-active-orders")
 async customerActiveOrders(@Query("customerId") customerId:string):Promise<OrderDto[]>{
     try {
-      return await this.service.customerActiveOrders(customerId);  
+      return await this.service.activeOrders("customerId",customerId);  
     } catch (error) {
       throw Error();
     }
@@ -50,7 +50,17 @@ async customerActiveOrders(@Query("customerId") customerId:string):Promise<Order
 @Get("hub-active-orders")
 async hubActiveOrders():Promise<OrderDto[]>{
     try {
-      return await this.service.hubActiveOrders();  
+      return await this.service.activeOrders("isDeliveringWithCourierService",true);  
+    } catch (error) {
+      throw Error();
+    }
+}
+
+@UseGuards(AuthGuard)
+@Get("courier-active-orders")
+async courierActiveOrders(@Query("courierId") courierId:string):Promise<OrderDto[]>{
+    try {
+      return await this.service.activeOrders("courierId",courierId);  
     } catch (error) {
       throw Error();
     }
@@ -70,7 +80,7 @@ async updateOrderState(@Body() params:OrderDto):Promise<boolean|HttpException>{
 @Get("restaurant-order-logs")
 async getOrderLogs(@Query("restaurantId") restaurantId:string,@Query("dateRange") dateRange:string):Promise<OrderDto[]>{
     try {
-      return await this.service.getOrderLogs(restaurantId,JSON.parse(dateRange));  
+      return await this.service.getOrderLogs("restaurantId",restaurantId,JSON.parse(dateRange));  
     } catch (error) {
       throw Error();
     }
@@ -80,7 +90,17 @@ async getOrderLogs(@Query("restaurantId") restaurantId:string,@Query("dateRange"
 @Get("hub-order-logs")
 async getOrderLogsForHub(@Query("dateRange") dateRange:string):Promise<OrderDto[]>{
     try {
-      return await this.service.getOrderLogsForHub(JSON.parse(dateRange));  
+      return await this.service.getOrderLogs("isDeliveringWithCourierService",true,JSON.parse(dateRange));  
+    } catch (error) {
+      throw Error();
+    }
+}
+
+@UseGuards(AuthGuard)
+@Get("courier-order-logs")
+async getOrderLogsForCourier(@Query("dateRange") dateRange:string):Promise<OrderDto[]>{
+    try {
+      return await this.service.getOrderLogs("isDeliveringWithCourierService",true,JSON.parse(dateRange));  
     } catch (error) {
       throw Error();
     }

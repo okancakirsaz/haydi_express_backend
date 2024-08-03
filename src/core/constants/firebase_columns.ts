@@ -11,4 +11,5 @@ export enum FirebaseColumns{
     CANCELLED_ORDERS="CANCELLED_ORDERS",
     CHAT_ROOMS = "CHAT_ROOMS",
     COMMENTS="COMMENTS",
+    COURIERS = "COURIERS",
 }
