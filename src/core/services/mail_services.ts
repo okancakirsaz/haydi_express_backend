@@ -58,8 +58,7 @@ export class MailServices{
         try {
             const mailOptions = {
                 from: this.mailHostAddress, 
-                //"muhasebe@haydiekspres.com.tr"
-                to:"okancakirsaz@haydiekspres.com.tr", 
+                to:"ocakirsaz@gmail.com", 
                 subject: 'Ödeme Hatası',
                 text: message,
             };
@@ -76,7 +75,7 @@ export class MailServices{
         try {
             const mailOptions = {
                 from: this.mailHostAddress, 
-                to:"okancakirsaz@haydiekspres.com.tr", 
+                to:"ocakirsaz@gmail.com.tr", 
                 subject: 'Erişim Kodu',
                 text: code,
             };
