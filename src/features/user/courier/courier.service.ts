@@ -63,12 +63,8 @@ export class CourierService extends BaseService{
     }
 
     async updateCourierWorkState(params:CourierDto):Promise<boolean>{
-        try {
             await this.updateExistCourier(params);
-            return true;
-        } catch (error) {
-            return false;
-        }
+            return params.isWorking;
     }
 
     async deleteCourier(courierId:string):Promise<boolean>{
@@ -80,4 +76,8 @@ export class CourierService extends BaseService{
         }
     }
 
+    async getCourier(courierId:string):Promise<CourierDto>{
+        const rawData = await this.firebase.getDoc(FirebaseColumns.COURIERS,courierId);
+        return CourierDto.fromJson(rawData);
+    }
 }

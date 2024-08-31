@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpException, Post, Query, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpException, Patch, Post, Query, UseGuards, UseInterceptors } from '@nestjs/common';
 import { CourierService } from './courier.service';
 import { AuthGuard } from 'src/core/guard/auth.guard';
 import { CourierDto } from 'src/core/dt_objects/user/courier.dto';
@@ -56,7 +56,7 @@ throw Error(error);
 
 
 @UseGuards(AuthGuard)
-@Post('update-courier-work-state')
+@Patch('update-courier-work-state')
 async updateCourierWorkState(@Body() params:CourierDto):Promise<boolean>{
 try {
 return await this.service.updateCourierWorkState(params);
@@ -71,6 +71,17 @@ throw Error(error);
 async deleteCourier(@Query("courierId") courierId:string):Promise<boolean>{
 try {
 return await this.service.deleteCourier(courierId);
+}
+catch (error) {
+throw Error(error);
+}
+}
+
+@UseGuards(AuthGuard)
+@Get('get-courier')
+async getCourier(@Query("courierId") courierId:string):Promise<CourierDto>{
+try {
+return await this.service.getCourier(courierId);
 }
 catch (error) {
 throw Error(error);
