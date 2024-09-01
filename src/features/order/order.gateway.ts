@@ -17,5 +17,8 @@ newHubOrder(@MessageBody() body:OrderDto){
 
 orderUpdate(@MessageBody() body:OrderDto,orderId:string){
     this.server.emit(orderId,OrderDto.toJson(body));
+    if(body.courierId!=null&&body.orderState=="Kuryeden Onay Bekleniyor"){
+        this.server.emit(body.courierId,OrderDto.toJson(body));
+    }
 }
 }
